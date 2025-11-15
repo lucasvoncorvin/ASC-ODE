@@ -6,6 +6,7 @@
 
 #include <vector.hpp>
 #include <matrix.hpp>
+#include <memory>
 
 namespace ASC_ode
 {

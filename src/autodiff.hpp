@@ -5,6 +5,7 @@
 #include <ostream> 
 #include <cmath>   
 #include <array>  
+#include <memory>
 
 
 namespace ASC_ode

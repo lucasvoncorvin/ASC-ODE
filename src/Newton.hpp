@@ -4,6 +4,7 @@
 #include "nonlinfunc.hpp"
 #include <inverse.hpp>
 #include <lapack_interface.hpp>
+#include <memory>
 
 namespace ASC_ode
 {  
