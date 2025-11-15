@@ -2,9 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # LOAD DATA
-exp  = np.loadtxt("rc_explicit.txt")
-imp  = np.loadtxt("rc_implicit.txt")
-cran = np.loadtxt("rc_crank.txt")
+exp  = np.loadtxt("exp.txt")
+imp  = np.loadtxt("imp.txt")
+cran = np.loadtxt("cn.txt")
 
 # Columns: time, UC
 t_exp,  U_exp  = exp[:,0], exp[:,1]
@@ -27,24 +27,25 @@ dU_cran = numerical_derivative(t_cran, U_cran)
 
 # FIGURE 1: TIME PLOT
 plt.figure(figsize=(10,6))
-plt.plot(t_exp,  U_exp,  label="Explicit Euler")
+#plt.plot(t_exp,  U_exp,  label="Explicit Euler")
 plt.plot(t_imp,  U_imp,  label="Implicit Euler")
 plt.plot(t_cran, U_cran, label="Crank–Nicolson")
 
 plt.xlabel("time t")
 plt.ylabel("Voltage UC(t)")
 plt.title("RC Circuit – UC(t) for Three Methods")
+
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig("rc_methods_time_200.png", dpi=200)
+plt.savefig("rc_methods_time_100_stiff1.png", dpi=200)
 plt.show()
 
 
 # FIGURE 2: PHASE PLOT
 plt.figure(figsize=(10,6))
 
-plt.plot(U_exp,  dU_exp,  label="Explicit Euler")
+#plt.plot(U_exp,  dU_exp,  label="Explicit Euler")
 plt.plot(U_imp,  dU_imp,  label="Implicit Euler")
 plt.plot(U_cran, dU_cran, label="Crank–Nicolson")
 
@@ -54,5 +55,5 @@ plt.title("Phase Plot of RC Circuit")
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig("rc_methods_phase_200.png", dpi=200)
+plt.savefig("rc_methods_phase_100_stiff1.png", dpi=200)
 plt.show()

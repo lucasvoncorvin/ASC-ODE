@@ -92,45 +92,66 @@ public:
 class CrankNicolson : public TimeStepper
 {
 private:
-    std::shared_ptr<NonlinearFunction> m_equ;
-    std::shared_ptr<ConstantFunction> m_yold;
-    std::shared_ptr<ConstantFunction> m_fold;
-    std::shared_ptr<Parameter> m_tau_half;
-
-    Vector<> m_tmp_f;
+    std::shared_ptr<NonlinearFunction> G;
+    std::shared_ptr<ConstantFunction> y_old;
+    std::shared_ptr<ConstantFunction> f_old;
+    std::shared_ptr<Parameter> tau_param;
 
 public:
     CrankNicolson(std::shared_ptr<NonlinearFunction> rhs)
-        : TimeStepper(rhs),
-          m_tmp_f(rhs->dimF())
+        : TimeStepper(rhs)
     {
-        m_yold = std::make_shared<ConstantFunction>(Vector<>(rhs->dimX()));
-        m_fold = std::make_shared<ConstantFunction>(Vector<>(rhs->dimF()));
-        m_tau_half = std::make_shared<Parameter>(0.0);
-        auto Id = std::make_shared<IdentityFunction>(rhs->dimX());
-        auto term1 = std::make_shared<SumFunction>(
-            Id, m_yold, 1.0, -1.0
-        );
-        auto term2 = (-1.0) * (m_tau_half * this->m_rhs);
-        m_equ = std::make_shared<SumFunction>(
-            term1, term2, 1.0, 1.0
-        );
-        m_equ = std::make_shared<SumFunction>(
-            m_equ, m_fold, 1.0, 1.0
+        size_t n = rhs->dimX();
+
+        y_old  = std::make_shared<ConstantFunction>(Vector<>(n));
+        f_old  = std::make_shared<ConstantFunction>(Vector<>(n));
+        tau_param = std::make_shared<Parameter>(0.0);
+
+        auto Id = std::make_shared<IdentityFunction>(n);
+
+        // (y - y_old)
+        auto term1 = std::make_shared<SumFunction>(Id, y_old,
+                                                   1.0, -1.0);
+
+        // -(tau/2)*f(y)
+        auto half_tau = std::make_shared<Parameter>(0.5);
+        auto scaled_rhs = std::make_shared<ScaleFunction>(rhs, tau_param);
+        auto minus_half_scaled_rhs =
+            std::make_shared<ScaleFunction>(scaled_rhs, std::make_shared<Parameter>(-0.5));
+
+        // -(tau/2)*f_old
+        auto scaled_f_old = std::make_shared<ScaleFunction>(f_old, tau_param);
+        auto minus_half_f_old =
+            std::make_shared<ScaleFunction>(scaled_f_old, std::make_shared<Parameter>(-0.5));
+
+        // G = (y - y_old) - (tau/2)(f(y) + f_old)
+        G = std::make_shared<SumFunction>(
+            term1,
+            std::make_shared<SumFunction>(minus_half_scaled_rhs, minus_half_f_old,
+                                          1.0, 1.0),
+            1.0, 1.0
         );
     }
 
     void DoStep(double tau, VectorView<> y) override
     {
-        double half = 0.5 * tau;
-        m_tau_half->set(half);
-        m_yold->set(y);
-        this->m_rhs->evaluate(y, m_tmp_f);
-        Vector<> tmp = -half * m_tmp_f;
-        m_fold->set(tmp);
-        NewtonSolver(m_equ, y, 1e-10, 30, nullptr);
+     
+        y_old->set(y);
+        Vector<> ft(y.size());
+        m_rhs->evaluate(y, ft);
+        f_old->set(ft);
+
+        tau_param->set(tau);
+
+        double t_old = y(1);
+
+        NewtonSolver(G, y, 1e-10, 1000, nullptr);
+
+    
+        y(1) = t_old + tau;
     }
 };
+
 
 
 }
