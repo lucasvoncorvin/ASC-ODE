@@ -37,13 +37,13 @@ public:
 int main()
 {
   double tend = 4 * std::numbers::pi;
-  int steps = 100;
+  int steps = 20;
   double tau = tend/steps;
 
   Vector<> y = { 1, 0 };  // initializer list
   auto rhs = std::make_shared<MassSpring>(1.0, 1.0);
   
-  CrankNicolson stepper(rhs);
+  ImplicitEuler stepper(rhs);
 
   std::ofstream outfile ("output_test_ode.txt");
   std::cout << 0.0 << "  " << y(0) << " " << y(1) << std::endl;

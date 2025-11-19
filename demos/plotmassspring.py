@@ -14,7 +14,7 @@ plt.title('Mass-Spring System Time Evolution')
 plt.legend()
 plt.grid()
 
-plt.savefig("time_evolution_100_CN.png", dpi=300, bbox_inches='tight')
+plt.savefig("time_evolution_20_IE.png", dpi=300, bbox_inches='tight')
 
 
 # Figure 2 
@@ -26,6 +26,6 @@ plt.title('Mass-Spring System Phase Plot')
 plt.legend()
 plt.grid()
 
-plt.savefig("phase_plot_100_CN.png", dpi=300, bbox_inches='tight')
+plt.savefig("phase_plot_20_IE.png", dpi=300, bbox_inches='tight')
 
 plt.show()
