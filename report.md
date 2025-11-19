@@ -2,12 +2,7 @@ This report will discuss several topics while dealing with the analysis of speci
 Such methods are usually obtained by integrating the ODE and using numerical integration on the given function $f(t,y(t))$.
 
 In the first example, we are given the mass-spring relation, which is given by the following equation:
-$$
-\begin{equation}
-m y''(t)=-k y(t)
-\end{equation}
-$$
-
+$m\, y''(t) = -k\, y(t)$
 , where $m$ is the mass and k the spring constant. This is an ODE of second order, so first we need to rewrite it  as a problem of first order:
 
 $$
