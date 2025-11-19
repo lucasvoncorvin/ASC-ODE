@@ -3,8 +3,11 @@ Such methods are usually obtained by integrating the ODE and using numerical int
 
 In the first example, we are given the mass-spring relation, which is given by the following equation:
 $$
+\begin{equation}
 m y''(t)=-k y(t)
+\end{equation}
 $$
+
 , where $m$ is the mass and k the spring constant. This is an ODE of second order, so first we need to rewrite it  as a problem of first order:
 
 $$
