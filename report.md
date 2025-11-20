@@ -89,6 +89,6 @@ Implicit Euler 1000 time steps
 </p>
 
 The results confirm the expectations. For large time steps, the implicit and explicit Euler are either exploding (Explicit) or totally decaying (Implicit). For the improved Euler, we see a slight increase of the energy for larger time steps but as soon as the time steps decrease enough, the solution becomes quite accurate, and we observe a closed circle.
-For the Crank-Nicholson method, we observe already for very large time steps that the energy stays conserved, no increasing of amplitude or spiraling outwards in the phase plot. This is expected since it is exactly energy preserving for linear Hamiltonians.
+For the Crank-Nicholson method, we observe already for very large time steps that the energy stays conserved, no increasing of amplitude or spiraling outwards in the phase plot. This is expected since it can represent the energy conservation pretty accurate for linear Hamiltonians.
 For the Explicit and Implicit Euler, we see even for very small time steps, that the drift away from the equilibrium stays visible.
 
