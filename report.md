@@ -25,7 +25,7 @@ For smaller time steps, this effect will be expected to be less strong.
 
 For the implicit Euler, we expect the opposite effect, trajectories spiraling inwards. This is due to the fact that it is also not a symplectic integrator and it adds artificial damping to the system s.t $E_{n+1} \le E_n$.
 
-For the explicit midpoint scheme, we expect better rates of convergence because it is a second-order method, compared to the other Euler methods. For the Crank-Nicolson scheme, since it is a symplectic integrator, we expect almost perfectly closed circles even for smaller time steps. 
+For the explicit midpoint scheme, we expect better rates of convergence because it is a second-order method, compared to the other Euler methods. For the Crank-Nicolson scheme, we expect good results, because it can match the behavior of linear Hamiltonians very accurate, therefore, we expect almost perfectly closed circles even for smaller time steps. 
 The simulation goes from $t_0=0$ until $t_{end}=4 \pi$
 
 Explicit Euler 20 time steps
