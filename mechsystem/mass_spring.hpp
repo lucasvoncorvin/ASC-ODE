@@ -57,64 +57,64 @@ public:
 template <int D>
 class MassSpringSystem
 {
-  std::vector<Fix<D>> fixes;
-  std::vector<Mass<D>> masses;
-  std::vector<Spring> springs;
-  Vec<D> gravity=0.0;
+  std::vector<Fix<D>> m_fixes;
+  std::vector<Mass<D>> m_masses;
+  std::vector<Spring> m_springs;
+  Vec<D> m_gravity=0.0;
 public:
-  void SetGravity (Vec<D> _gravity) { gravity = _gravity; }
-  Vec<D> Gravity() const { return gravity; }
-  
-  Connector AddFix (Fix<D> p)
+  void setGravity (Vec<D> gravity) { m_gravity = gravity; }
+  Vec<D> getGravity() const { return m_gravity; }
+
+  Connector addFix (Fix<D> p)
   {
-    fixes.push_back(p);
-    return { Connector::FIX, fixes.size()-1 };
+    m_fixes.push_back(p);
+    return { Connector::FIX, m_fixes.size()-1 };
   }
 
-  Connector AddMass (Mass<D> m)
+  Connector addMass (Mass<D> m)
   {
-    masses.push_back (m);
-    return { Connector::MASS, masses.size()-1 };
+    m_masses.push_back (m);
+    return { Connector::MASS, m_masses.size()-1 };
   }
   
-  size_t AddSpring (Spring s) // double length, double stiffness, Connector c1, Connector c2)
+  size_t addSpring (Spring s) // double length, double stiffness, Connector c1, Connector c2)
   {
-    springs.push_back (s); // Spring{length, stiffness, { c1, c2 } });
-    return springs.size()-1;
+    m_springs.push_back (s); // Spring{length, stiffness, { c1, c2 } });
+    return m_springs.size()-1;
   }
 
 
 
-  
-  auto & Fixes() { return fixes; } 
-  auto & Masses() { return masses; } 
-  auto & Springs() { return springs; }
 
-  void GetState (VectorView<> values, VectorView<> dvalues, VectorView<> ddvalues)
+  auto & fixes() { return m_fixes; } 
+  auto & masses() { return m_masses; } 
+  auto & springs() { return m_springs; }
+
+  void getState (VectorView<> values, VectorView<> dvalues, VectorView<> ddvalues)
   {
-    auto valmat = values.asMatrix(Masses().size(), D);
-    auto dvalmat = dvalues.asMatrix(Masses().size(), D);
-    auto ddvalmat = ddvalues.asMatrix(Masses().size(), D);    
+    auto valmat = values.asMatrix(m_masses.size(), D);
+    auto dvalmat = dvalues.asMatrix(m_masses.size(), D);
+    auto ddvalmat = ddvalues.asMatrix(m_masses.size(), D);
 
-    for (size_t i = 0; i < Masses().size(); i++)
+    for (size_t i = 0; i < m_masses.size(); i++)
       {
-        valmat.row(i) = Masses()[i].pos;
-        dvalmat.row(i) = Masses()[i].vel;
-        ddvalmat.row(i) = Masses()[i].acc;
+        valmat.row(i) = m_masses[i].pos;
+        dvalmat.row(i) = m_masses[i].vel;
+        ddvalmat.row(i) = m_masses[i].acc;
       }
   }
-  
-  void SetState (VectorView<> values, VectorView<> dvalues, VectorView<> ddvalues)
-  {
-    auto valmat = values.asMatrix(Masses().size(), D);
-    auto dvalmat = dvalues.asMatrix(Masses().size(), D);
-    auto ddvalmat = ddvalues.asMatrix(Masses().size(), D);
 
-    for (size_t i = 0; i < Masses().size(); i++)
+  void setState (VectorView<> values, VectorView<> dvalues, VectorView<> ddvalues)
+  {
+    auto valmat = values.asMatrix(m_masses.size(), D);
+    auto dvalmat = dvalues.asMatrix(m_masses.size(), D);
+    auto ddvalmat = ddvalues.asMatrix(m_masses.size(), D);
+
+    for (size_t i = 0; i < m_masses.size(); i++)
       {
-        Masses()[i].pos = valmat.row(i);
-        Masses()[i].vel = dvalmat.row(i);
-        Masses()[i].acc = ddvalmat.row(i);
+        m_masses[i].pos = valmat.row(i);
+        m_masses[i].vel = dvalmat.row(i);
+        m_masses[i].acc = ddvalmat.row(i);
       }
   }
 };
@@ -123,15 +123,15 @@ template <int D>
 std::ostream & operator<< (std::ostream & ost, MassSpringSystem<D> & mss)
 {
   ost << "fixes:" << std::endl;
-  for (auto f : mss.Fixes())
+  for (auto f : mss.fixes())
     ost << f.pos << std::endl;
 
   ost << "masses: " << std::endl;
-  for (auto m : mss.Masses())
+  for (auto m : mss.masses())
     ost << "m = " << m.mass << ", pos = " << m.pos << std::endl;
 
   ost << "springs: " << std::endl;
-  for (auto sp : mss.Springs())
+  for (auto sp : mss.springs())
     ost << "length = " << sp.length << ", stiffness = " << sp.stiffness
         << ", C1 = " << sp.connections[0] << ", C2 = " << sp.connections[1] << std::endl;
   return ost;
@@ -146,29 +146,29 @@ public:
   MSS_Function (MassSpringSystem<D> & _mss)
     : mss(_mss) { }
 
-  virtual size_t dimX() const override { return D*mss.Masses().size(); }
-  virtual size_t dimF() const override{ return D*mss.Masses().size(); }
+  virtual size_t dimX() const override { return D*mss.masses().size(); }
+  virtual size_t dimF() const override{ return D*mss.masses().size(); }
 
   virtual void evaluate (VectorView<double> x, VectorView<double> f) const override
   {
     f = 0.0;
-    
-    auto xmat = x.asMatrix(mss.Masses().size(), D);
-    auto fmat = f.asMatrix(mss.Masses().size(), D);
 
-    for (size_t i = 0; i < mss.Masses().size(); i++)
-      fmat.row(i) = mss.Masses()[i].mass*mss.Gravity();
-    
-    for (auto spring : mss.Springs())
+    auto xmat = x.asMatrix(mss.masses().size(), D);
+    auto fmat = f.asMatrix(mss.masses().size(), D);
+
+    for (size_t i = 0; i < mss.masses().size(); i++)
+      fmat.row(i) = mss.masses()[i].mass*mss.getGravity();
+
+    for (auto spring : mss.springs())
       {
         auto [c1,c2] = spring.connections;
         Vec<D> p1, p2;
         if (c1.type == Connector::FIX)
-          p1 = mss.Fixes()[c1.nr].pos;
+          p1 = mss.fixes()[c1.nr].pos;
         else
           p1 = xmat.row(c1.nr);
         if (c2.type == Connector::FIX)
-          p2 = mss.Fixes()[c2.nr].pos;
+          p2 = mss.fixes()[c2.nr].pos;
         else
           p2 = xmat.row(c2.nr);
 
@@ -180,8 +180,8 @@ public:
           fmat.row(c2.nr) -= force*dir12;
       }
 
-    for (size_t i = 0; i < mss.Masses().size(); i++)
-      fmat.row(i) *= 1.0/mss.Masses()[i].mass;
+    for (size_t i = 0; i < mss.masses().size(); i++)
+      fmat.row(i) *= 1.0/mss.masses()[i].mass;
   }
   
   virtual void evaluateDeriv (VectorView<double> x, MatrixView<double> df) const override
