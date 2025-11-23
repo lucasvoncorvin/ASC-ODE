@@ -6,6 +6,9 @@ author: Team 03
 logo: ASC_Logo_transparent_300ppi_RGB.png
 copyright : "2025"  # Copyright year to be placed in the footer
 
+# Include any extra files needed for the book build
+extra_files:
+  - pictures/*
 
 # Force re-execution of notebooks on each build.
 # See https://jupyterbook.org/content/execute.html

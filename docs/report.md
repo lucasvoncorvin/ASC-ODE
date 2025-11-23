@@ -31,64 +31,84 @@ For the explicit midpoint scheme, we expect better rates of convergence because 
 The simulation goes from $t_0=0$ until $t_{end}=4 \pi$
 
 Explicit Euler 20 time steps
-<p float="left">
-  <img src="./pictures/time_evolution_20.png" width="45%" />
-  <img src="./pictures/phase_plot_20.png" width="45%" />
-</p>
+```{image} pictures/time_evolution_20.png
+:width: 45%
+```
+```{image} pictures/phase_plot_20.png
+:width: 45%
+```
 
 Implicit Euler 20 time steps
-<p float="left">
-  <img src="./pictures/time_evolution_20_IE.png" width="45%" />
-  <img src="./pictures/phase_plot_20_IE.png" width="45%" />
-</p>
+```{image} pictures/time_evolution_20_IE.png
+:width: 45%
+```
+```{image} pictures/phase_plot_20_IE.png
+:width: 45%
+```
 
 Improved Euler 20 time steps
-<p float="left">
-  <img src="./pictures/time_evolution_20_RK2.png" width="45%" />
-  <img src="./pictures/phase_plot_20_RK2.png" width="45%" />
-</p>
+```{image} pictures/time_evolution_20_RK2.png
+:width: 45%
+```
+```{image} pictures/phase_plot_20_RK2.png
+:width: 45%
+```
 
 Crank-Nicolson 20 time steps
-<p float="left">
-  <img src="./pictures/time_evolution_20_CN.png" width="45%" />
-  <img src="./pictures/phase_plot_20_CN.png" width="45%" />
-</p>
+```{image} pictures/time_evolution_20_CN.png
+:width: 45%
+```
+```{image} pictures/phase_plot_20_CN.png
+:width: 45%
+```
 
 Explicit Euler 100 time steps
-<p float="left">
-  <img src="./pictures/time_evolution_100.png" width="45%" />
-  <img src="./pictures/phase_plot_100.png" width="45%" />
-</p>
+```{image} pictures/time_evolution_100.png
+:width: 45%
+```
+```{image} pictures/phase_plot_100.png
+:width: 45%
+```
 
 Implicit Euler 100 time steps
-<p float="left">
-  <img src="./pictures/time_evolution_100_IE.png" width="45%" />
-  <img src="./pictures/phase_plot_100_IE.png" width="45%" />
-</p>
+```{image} pictures/time_evolution_100_IE.png
+:width: 45%
+```
+```{image} pictures/phase_plot_100_IE.png
+:width: 45%
+```
 
 Improved Euler 100 time steps
-<p float="left">
-  <img src="./pictures/time_evolution_100_RK2.png" width="45%" />
-  <img src="./pictures/phase_plot_100_RK2.png" width="45%" />
-</p>
+```{image} pictures/time_evolution_100_RK2.png
+:width: 45%
+```
+```{image} pictures/phase_plot_100_RK2.png
+:width: 45%
+```
 
 Crank-Nicolson 100 time steps
-<p float="left">
-  <img src="./pictures/time_evolution_100_CN.png" width="45%" />
-  <img src="./pictures/phase_plot_100_CN.png" width="45%" />
-</p>
+```{image} pictures/time_evolution_100_CN.png
+:width: 45%
+```
+```{image} pictures/phase_plot_100_CN.png
+:width: 45%
+```
 
 Explicit Euler 1000 time steps
-<p float="left">
-  <img src="./pictures/time_evolution_1000.png" width="45%" />
-  <img src="./pictures/phase_plot_1000.png" width="45%" />
-</p>
+```{image} pictures/time_evolution_1000.png
+:width: 45%
+```
+```{image} pictures/phase_plot_1000.png
+:width: 45%
+```
 
 Implicit Euler 1000 time steps
-<p float="left">
-  <img src="./pictures/time_evolution_1000_IE.png" width="45%" />
-  <img src="./pictures/phase_plot_1000_IE.png" width="45%" />
-</p>
+```{image} pictures/time_evolution_1000_IE.png
+:width: 45%
+```
+```{image} pictures/phase_plot_1000_IE.png
+:width: 45%
+```
 
 The results confirm the expectations. For large time steps, the implicit and explicit Euler are either exploding (Explicit) or totally decaying (Implicit). For the improved Euler, we see a slight increase of the energy for larger time steps but as soon as the time steps decrease enough, the solution becomes quite accurate, and we observe a closed circle.
 For the Crank-Nicholson method, we observe already for very large time steps that the energy stays conserved, no increasing of amplitude or spiraling outwards in the phase plot. This is expected since it can represent the energy conservation pretty accurate for linear Hamiltonians.
