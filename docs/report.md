@@ -119,12 +119,14 @@ Electric Network:
 
 In the next task, we want to model an electric network with an ODE. We are given a Voltage source $U_0 = cos(100 \pi t)$. We are given the variables $R$ for the resistance and $C$ for the capacity. 
 The system can be written as :
+
 $$
 \begin{aligned}
-U_c(t) + R C \frac{dU_c(t)}{dt} = U_0(t) \\
-\frac{dU_c(t)}{dt} = -\frac{U_c(t)}{RC} + \frac{U_0(t)}{RC}.
+U_c(t) + RC\frac{dU_c}{dt} &= U_0(t), \\
+\frac{dU_c}{dt} &= -\frac{U_c(t)}{RC} + \frac{U_0(t)}{RC}.
 \end{aligned}
 $$
+
 
 So we can see our system is decomposed into a decaying exponential solution and oscillatory solution. 
 The decay of the exponential solution is hereby determined by the term $\frac{-1}{RC}$. If $RC$ becomes small the transient behaviour vanishes very quickly.
