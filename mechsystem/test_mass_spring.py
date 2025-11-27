@@ -2,7 +2,6 @@ import sys
 sys.path.append('/Users/joachim/texjs/lva/IntroSC/ASC-ODE/build/mechsystem')
 
 from mass_spring import *
-import ngsolve.bla
 
 
 mss = MassSpringSystem3d()
