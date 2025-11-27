@@ -115,6 +115,7 @@ For the Crank-Nicholson method, we observe already for very large time steps tha
 For the Explicit and Implicit Euler, we see even for very small time steps, that the drift away from the equilibrium stays visible.
 
 
+Electric Network:
 
 In the next task, we want to model an electric network with an ODE. We are given a Voltage source $U_0 = cos(100 \pi t)$. We are given the variables $R$ for the resistance and $C$ for the capacity. 
 The system can be written as :
