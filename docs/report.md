@@ -122,7 +122,7 @@ The system can be written as :
 $$
 \begin{aligned}
 U_c(t) + R C \frac{dU_c(t)}{dt} = U_0(t) \\
-\frac{dU_c(t)}{dt} = -\frac{U_c(t)}{RC} + \frac{U_0(t)}{RC}
+\frac{dU_c(t)}{dt} = -\frac{U_c(t)}{RC} + \frac{U_0(t)}{RC}.
 \end{aligned}
 $$
 
@@ -131,16 +131,7 @@ The decay of the exponential solution is hereby determined by the term $\frac{-1
 We can solve the system and compute exact solution by splitting into homogeneous and particular solution and define $\tau = RC$ and $\omega = 100 pi$.
 
 $$
-\begin{equation}
-U_C(t)
-=
-- \frac{1}{1+(\tau\omega)^2}
-e^{-t/\tau}
-+
-\frac{1}{1+(\tau\omega)^2}\cos(\omega t)
-+
-\frac{\tau\omega}{1+(\tau\omega)^2}\sin(\omega t)
-\end{equation}
+U_C(t)=-\frac{1}{1+(\tau\omega)^2} e^{-t/\tau}+\frac{1}{1+(\tau\omega)^2}\cos(\omega t)+\frac{\tau\omega}{1+(\tau\omega)^2}\sin(\omega t).
 $$
 
 In the first test case, we set $R=C=1$. Therefore we expect visible decay of the amplitude of the oscillations and we expect similar results for all methods, where explicit might overshoot and implicit might undershoot amplitudes.
