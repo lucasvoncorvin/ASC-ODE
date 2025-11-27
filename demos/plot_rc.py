@@ -2,9 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # LOAD DATA
-exp  = np.loadtxt("exp.txt")
-imp  = np.loadtxt("imp.txt")
-cran = np.loadtxt("cn.txt")
+exp  = np.loadtxt("rc_explicit.txt")
+imp  = np.loadtxt("rc_implicit.txt")
+cran = np.loadtxt("rc_crank.txt")
 
 # Columns: time, UC
 t_exp,  U_exp  = exp[:,0], exp[:,1]
@@ -38,7 +38,7 @@ plt.title("RC Circuit – UC(t) for Three Methods")
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig("rc_methods_time_100_stiff1.png", dpi=200)
+plt.savefig("rc_methods_time_1_50_R_C_stiff_woEE.png", dpi=200)
 plt.show()
 
 
@@ -55,5 +55,5 @@ plt.title("Phase Plot of RC Circuit")
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig("rc_methods_phase_100_stiff1.png", dpi=200)
+plt.savefig("rc_methods_phase_1_50_R_C_stiff.png", dpi=200)
 plt.show()
