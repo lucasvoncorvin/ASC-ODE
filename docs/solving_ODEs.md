@@ -1,6 +1,7 @@
 # Solving ODEs
 
 We solve ODEs of the form
+
 $$
     y' = f(y)
 $$
