@@ -4,7 +4,9 @@ We solve ODEs of the form
 $$
     y' = f(y)
 $$
+
 Higher order ODEs must be converted into a system of first order ODEs. For example an undamped mass spring system is described by the second order ODE
+
 $$
 \begin{aligned}
     m y''(t) + k y(t) &= 0 \\
@@ -13,6 +15,7 @@ $$
 $$
 
 which can be converted to a system of first order ODEs by setting
+
 $$
 \begin{aligned}
     y &= y_0 \\
