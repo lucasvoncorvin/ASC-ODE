@@ -5,6 +5,8 @@ format: jb-book
 root: intro.md
 chapters:
   - file: solving_ODEs.md
+    sections:
+      - file: runge_kutta_timesteppers.md
   - file: examples.md
     sections:
       - file: example_mass_spring.md
