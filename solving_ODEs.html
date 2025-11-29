@@ -62,7 +62,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'solving_ODEs';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="next" title="General Runge Kutta" href="runge_kutta_timesteppers.html" />
     <link rel="prev" title="Intro" href="intro.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -182,7 +182,10 @@
             </li>
         </ul>
         <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Solving ODEs</a></li>
+<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Solving ODEs</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="runge_kutta_timesteppers.html">General Runge Kutta</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="example_mass_spring.html">Mass-Spring System</a></li>
 <li class="toctree-l2"><a class="reference internal" href="example_electric_network.html">Electric Network</a></li>
@@ -369,25 +372,28 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="solving-odes">
 <h1>Solving ODEs<a class="headerlink" href="#solving-odes" title="Link to this heading">#</a></h1>
-<p>We solve ODEs of the form
-$<span class="math notranslate nohighlight">\(
-    y' = f(x, y)
-\)</span><span class="math notranslate nohighlight">\(
-Higher order ODEs must be converted into a system of first order ODEs. For example an undamped mass spring system is described by the second order ODE
-\)</span><span class="math notranslate nohighlight">\(
+<p>We solve ODEs of the form</p>
+<div class="math notranslate nohighlight">
+\[
+    y' = f(y)
+\]</div>
+<p>Higher order ODEs must be converted into a system of first order ODEs. For example an undamped mass spring system is described by the second order ODE</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
 \begin{aligned}
     m y''(t) + k y(t) &amp;= 0 \\
     y''(t) &amp;= - \frac{k}{m} y(t) 
 \end{aligned}
-\)</span>$</p>
-<p>which can be converted to a system of first order ODEs by setting
-$<span class="math notranslate nohighlight">\(
+\end{split}\]</div>
+<p>which can be converted to a system of first order ODEs by setting</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
 \begin{aligned}
     y &amp;= y_0 \\
     y' = y_0' &amp;= y_1 \\
     y'' = y_1' &amp;= - \frac{k}{m} y_0
 \end{aligned}
-\)</span>$</p>
+\end{split}\]</div>
 <p>which can be written in matrix form as</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
@@ -405,9 +411,10 @@ $<span class="math notranslate nohighlight">\(
     y_1
 \end{pmatrix}
 \end{split}\]</div>
+<p>Finally if the ODE is not autonomous, i.e. f = f(t, y), it must be converted into an autonomous form.</p>
 <section id="right-hand-side-function">
 <h2>Right-Hand Side Function<a class="headerlink" href="#right-hand-side-function" title="Link to this heading">#</a></h2>
-<p>The right hand side <span class="math notranslate nohighlight">\(f(t, x)\)</span> is represented as a derived class from the abstract NonlinearFunction base class.
+<p>The right hand side <span class="math notranslate nohighlight">\(f(x)\)</span> is represented as a derived class from the abstract NonlinearFunction base class.
 We have to implement the following member functions</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="k">class</span><span class="w"> </span><span class="nc">NonlinearFunction</span>
 <span class="w">    </span><span class="p">{</span>
@@ -423,7 +430,9 @@ We have to implement the following member functions</p>
 </pre></div>
 </div>
 <p>For the mass spring example we implement</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="k">class</span><span class="w"> </span><span class="nc">MassSpring</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">NonlinearFunction</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">ASC_ode</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">class</span><span class="w"> </span><span class="nc">MassSpring</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">NonlinearFunction</span>
 <span class="w">    </span><span class="p">{</span>
 <span class="w">    </span><span class="k">private</span><span class="o">:</span>
 <span class="w">    </span><span class="c1">// the function has two parameter, which are assigned in the constructor</span>
@@ -487,7 +496,9 @@ The provided implementations are:</p>
 <section id="example">
 <h2>Example<a class="headerlink" href="#example" title="Link to this heading">#</a></h2>
 <p>We provide an example using the ExplicitEuler implementation</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="c1">// define the timestep</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">ASC_ode</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// define the timestep</span>
 <span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w">          </span><span class="c1">// we seek the solution a time 10</span>
 <span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">steps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span><span class="w">        </span><span class="c1">// number of steps the solver should take</span>
 <span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">tau</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="o">/</span><span class="n">steps</span><span class="p">;</span><span class="w">   </span><span class="c1">// size of the timestep</span>
@@ -512,6 +523,8 @@ The provided implementations are:</p>
 </pre></div>
 </div>
 </section>
+<div class="toctree-wrapper compound">
+</div>
 </section>
 
     <script type="text/x-thebe-config">
@@ -554,11 +567,11 @@ The provided implementations are:</p>
       </div>
     </a>
     <a class="right-next"
-       href="examples.html"
+       href="runge_kutta_timesteppers.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Examples</p>
+        <p class="prev-next-title">General Runge Kutta</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

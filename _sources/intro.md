@@ -64,7 +64,7 @@ To configure and build some tests do
 - Explicit Euler
 - Implicit Euler
 - Explicit Runge-Kutta
-  - Runge-Kutta 2
+  - Runge-Kutta 2 (Improved Euler)
 - Implicit Runge-Kutta
 - Cranck-Nicolson
 

@@ -1,10 +1,13 @@
 # Solving ODEs
 
 We solve ODEs of the form
+
 $$
-    y' = f(x, y)
+    y' = f(y)
 $$
+
 Higher order ODEs must be converted into a system of first order ODEs. For example an undamped mass spring system is described by the second order ODE
+
 $$
 \begin{aligned}
     m y''(t) + k y(t) &= 0 \\
@@ -13,6 +16,7 @@ $$
 $$
 
 which can be converted to a system of first order ODEs by setting
+
 $$
 \begin{aligned}
     y &= y_0 \\
@@ -39,9 +43,11 @@ $$
 \end{pmatrix}
 $$
 
+Finally if the ODE is not autonomous, i.e. f = f(t, y), it must be converted into an autonomous form.
+
 ## Right-Hand Side Function
 
-The right hand side $f(t, x)$ is represented as a derived class from the abstract NonlinearFunction base class.
+The right hand side $f(x)$ is represented as a derived class from the abstract NonlinearFunction base class.
 We have to implement the following member functions
 ```cpp
     class NonlinearFunction
@@ -60,6 +66,8 @@ We have to implement the following member functions
 For the mass spring example we implement 
 
 ```cpp
+    using namespace ASC_ode;
+
     class MassSpring : public NonlinearFunction
     {
     private:
@@ -123,6 +131,8 @@ public:
 We provide an example using the ExplicitEuler implementation
 
 ```cpp
+    using namespace ASC_ode;
+
     // define the timestep
     double t = 10;          // we seek the solution a time 10
     int steps = 100;        // number of steps the solver should take
