@@ -4,7 +4,13 @@
 format: jb-book
 root: intro.md
 chapters:
-- file: report.md
+  - file: solving_ODEs.md
+  - file: examples.md
+    sections:
+      - file: example_mass_spring.md
+      - file: example_electric_network.md
+      - file: example_runge_kutta.md
+  - file: other_stuff.md
 
 
 
