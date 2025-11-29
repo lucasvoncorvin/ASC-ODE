@@ -2,7 +2,7 @@
 
 We solve ODEs of the form
 $$
-    y' = f(x, y)
+    y' = f(y)
 $$
 Higher order ODEs must be converted into a system of first order ODEs. For example an undamped mass spring system is described by the second order ODE
 $$
@@ -39,9 +39,11 @@ $$
 \end{pmatrix}
 $$
 
+Finally if the ODE is not autonomous, i.e. f = f(t, y), it must be converted into an autonomous form.
+
 ## Right-Hand Side Function
 
-The right hand side $f(t, x)$ is represented as a derived class from the abstract NonlinearFunction base class.
+The right hand side $f(x)$ is represented as a derived class from the abstract NonlinearFunction base class.
 We have to implement the following member functions
 ```cpp
     class NonlinearFunction
@@ -61,7 +63,7 @@ For the mass spring example we implement
 
 ```cpp
     using namespace ASC_ode;
-    
+
     class MassSpring : public NonlinearFunction
     {
     private:
