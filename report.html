@@ -62,7 +62,6 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'report';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Welcome to ASC-ODE’s documentation!" href="intro.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -125,6 +124,8 @@
       
       
       
+        
+      
       <div class="bd-sidebar-primary bd-sidebar">
         
 
@@ -176,12 +177,19 @@
         <ul class="nav bd-sidenav bd-sidenav__home-link">
             <li class="toctree-l1">
                 <a class="reference internal" href="intro.html">
-                    Welcome to ASC-ODE’s documentation!
+                    Welcome to the documentation of the ASC-ODE libray implemented by Team 03!
                 </a>
             </li>
         </ul>
-        <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Report</a></li>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="solving_ODEs.html">Solving ODEs</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="example_mass_spring.html">Mass-Spring System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_electric_network.html">Electric Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_runge_kutta.html">Runge Kutta</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="other_stuff.html">Useful Classes</a></li>
 </ul>
 
     </div>
@@ -426,6 +434,79 @@ The simulation goes from <span class="math notranslate nohighlight">\(t_0=0\)</s
 <p>The results confirm the expectations. For large time steps, the implicit and explicit Euler are either exploding (Explicit) or totally decaying (Implicit). For the improved Euler, we see a slight increase of the energy for larger time steps but as soon as the time steps decrease enough, the solution becomes quite accurate, and we observe a closed circle.
 For the Crank-Nicholson method, we observe already for very large time steps that the energy stays conserved, no increasing of amplitude or spiraling outwards in the phase plot. This is expected since it can represent the energy conservation pretty accurate for linear Hamiltonians.
 For the Explicit and Implicit Euler, we see even for very small time steps, that the drift away from the equilibrium stays visible.</p>
+<p>Electric Network:</p>
+<p>In the next task, we want to model an electric network with an ODE. We are given a Voltage source <span class="math notranslate nohighlight">\(U_0 = cos(100 \pi t)\)</span>. We are given the variables <span class="math notranslate nohighlight">\(R\)</span> for the resistance and <span class="math notranslate nohighlight">\(C\)</span> for the capacity.
+The system can be written as :</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+U_c(t) + RC\frac{dU_c}{dt} &amp;= U_0(t), \\
+\frac{dU_c}{dt} &amp;= -\frac{U_c(t)}{RC} + \frac{U_0(t)}{RC}.
+\end{aligned}
+\end{split}\]</div>
+<p>So we can see our system is decomposed into a decaying exponential solution and oscillatory solution.
+The decay of the exponential solution is hereby determined by the term <span class="math notranslate nohighlight">\(\frac{-1}{RC}\)</span>. If <span class="math notranslate nohighlight">\(RC\)</span> becomes small the transient behaviour vanishes very quickly.
+We can solve the system and compute exact solution by splitting into homogeneous and particular solution and define <span class="math notranslate nohighlight">\(\tau = RC\)</span> and <span class="math notranslate nohighlight">\(\omega = 100 pi\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[
+U_C(t)=-\frac{1}{1+(\tau\omega)^2} e^{-t/\tau}+\frac{1}{1+(\tau\omega)^2}\cos(\omega t)+\frac{\tau\omega}{1+(\tau\omega)^2}\sin(\omega t).
+\]</div>
+<p>In the first test case, we set <span class="math notranslate nohighlight">\(R=C=1\)</span>. Therefore we expect visible decay of the amplitude of the oscillations and we expect similar results for all methods, where explicit might overshoot and implicit might undershoot amplitudes.
+Since our stationary frequency is given by <span class="math notranslate nohighlight">\(f = 100 \pi / 2 pi = 50 Hz\)</span>, our period <span class="math notranslate nohighlight">\(T = 0.02s\)</span>, our time step should be small enough to detect oscillatory behavior. We run the simulation from <span class="math notranslate nohighlight">\(t_0 = 0\)</span> to <span class="math notranslate nohighlight">\(t_{end} = 5s\)</span>.
+So we expect for <span class="math notranslate nohighlight">\(N \geq t_{total}/\Delta t = 5/0.02 = 250\)</span>, that we see some oscillatory behavior.
+And in general we expect to see mostly a sinusoidal function since the prefactor of the exponential and the cosinus are two orders lower then the prefactor of the sine term.</p>
+<p>5000 time steps</p>
+<a class="reference internal image-reference" href="_images/rc_methods_time_5000_R_C_1.png"><img alt="_images/rc_methods_time_5000_R_C_1.png" src="_images/rc_methods_time_5000_R_C_1.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/rc_methods_phase_5000_R_C_1.png"><img alt="_images/rc_methods_phase_5000_R_C_1.png" src="_images/rc_methods_phase_5000_R_C_1.png" style="width: 45%;" />
+</a>
+<p>1000 time steps</p>
+<a class="reference internal image-reference" href="_images/rc_methods_time_5_1000_R_C_1.png"><img alt="_images/rc_methods_time_5_1000_R_C_1.png" src="_images/rc_methods_time_5_1000_R_C_1.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/rc_methods_phase_5_1000_R_C_1.png"><img alt="_images/rc_methods_phase_5_1000_R_C_1.png" src="_images/rc_methods_phase_5_1000_R_C_1.png" style="width: 45%;" />
+</a>
+<p>200 time steps</p>
+<a class="reference internal image-reference" href="_images/rc_methods_time_5_200_R_C_1.png"><img alt="_images/rc_methods_time_5_200_R_C_1.png" src="_images/rc_methods_time_5_200_R_C_1.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/rc_methods_phase_5_200_R_C_1.png"><img alt="_images/rc_methods_phase_5_200_R_C_1.png" src="_images/rc_methods_phase_5_200_R_C_1.png" style="width: 45%;" />
+</a>
+<p>50 time steps</p>
+<a class="reference internal image-reference" href="_images/rc_methods_time_5_50_R_C_1.png"><img alt="_images/rc_methods_time_5_50_R_C_1.png" src="_images/rc_methods_time_5_50_R_C_1.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/rc_methods_phase_5_50_R_C_1.png"><img alt="_images/rc_methods_phase_5_50_R_C_1.png" src="_images/rc_methods_phase_5_50_R_C_1.png" style="width: 45%;" />
+</a>
+<p>By analyzing the results, it becomes clear that the explicit Euler is underdamping, gives higher values first and then slowly decays to the stationary oscillating solution. The implicit Euler will give lower values and also decay to the stationary oscillating solution. As for the Crank Nicolson, we don’t see numerical damping so we only see the stationary solution which is oscillating.
+For larger time steps, for example <span class="math notranslate nohighlight">\(N=200\)</span>, we already see that the amplitudes are increasing and we don’t fully recover the oscillations, which completely die out when we only use <span class="math notranslate nohighlight">\(N=50\)</span>.
+So for small time steps, the Crank Nicholson recovers the behavior of the true solution the most, and our time steps should in general be small enough s.t we can recover the oscillations.</p>
+<p>Next we look into the second case, where <span class="math notranslate nohighlight">\(RC = 10^{-4}\)</span>, therefore the homogeneus solution is now modelled by a “stiff ODE”, because its transient response is vanishing really quick. This has some implications on the different methods. In general, the Explicit Euler should not be used for such models due to the nature of its stability function. For such high eigenvalues, we need really small time steps to be in a stable regime. In that case, we should expect exploding solutions for the Explicit Euler for <span class="math notranslate nohighlight">\(N \leq 10^4/2\)</span>. For the other two methods, they should remain always stable, since <span class="math notranslate nohighlight">\(\lambda \leq 0\)</span>. This time, we only simulate for <span class="math notranslate nohighlight">\(1s\)</span>. and the solution should be dominated by the cosine term this time, with the explonential decaying “quasi immediately”.</p>
+<p>5000 time steps</p>
+<a class="reference internal image-reference" href="_images/rc_methods_time_1_10000_R_C_stiff.png"><img alt="_images/rc_methods_time_1_10000_R_C_stiff.png" src="_images/rc_methods_time_1_10000_R_C_stiff.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/rc_methods_phase_1_10000_R_C_stiff.png"><img alt="_images/rc_methods_phase_1_10000_R_C_stiff.png" src="_images/rc_methods_phase_1_10000_R_C_stiff.png" style="width: 45%;" />
+</a>
+<p>1000 time steps with Explicit Euler</p>
+<a class="reference internal image-reference" href="_images/rc_methods_time_1_1000_R_C_stiff.png"><img alt="_images/rc_methods_time_1_1000_R_C_stiff.png" src="_images/rc_methods_time_1_1000_R_C_stiff.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/rc_methods_phase_1_1000_R_C_stiff.png"><img alt="_images/rc_methods_phase_1_1000_R_C_stiff.png" src="_images/rc_methods_phase_1_1000_R_C_stiff.png" style="width: 45%;" />
+</a>
+<p>1000 time steps without Explicit Euler</p>
+<a class="reference internal image-reference" href="_images/rc_methods_time_1_1000_R_C_stiff_woEE.png"><img alt="_images/rc_methods_time_1_1000_R_C_stiff_woEE.png" src="_images/rc_methods_time_1_1000_R_C_stiff_woEE.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/rc_methods_phase_1_1000_R_C_stiff_woEE.png"><img alt="_images/rc_methods_phase_1_1000_R_C_stiff_woEE.png" src="_images/rc_methods_phase_1_1000_R_C_stiff_woEE.png" style="width: 45%;" />
+</a>
+<p>200 time steps</p>
+<a class="reference internal image-reference" href="_images/rc_methods_time_1_200_R_C_stiff_woEE.png"><img alt="_images/rc_methods_time_1_200_R_C_stiff_woEE.png" src="_images/rc_methods_time_1_200_R_C_stiff_woEE.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/rc_methods_phase_1_200_R_C_stiff.png"><img alt="_images/rc_methods_phase_1_200_R_C_stiff.png" src="_images/rc_methods_phase_1_200_R_C_stiff.png" style="width: 45%;" />
+</a>
+<p>110 time steps</p>
+<a class="reference internal image-reference" href="_images/rc_methods_time_1_110_R_C_stiff_woEE.png"><img alt="_images/rc_methods_time_1_110_R_C_stiff_woEE.png" src="_images/rc_methods_time_1_110_R_C_stiff_woEE.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/rc_methods_phase_1_110_R_C_stiff.png"><img alt="_images/rc_methods_phase_1_110_R_C_stiff.png" src="_images/rc_methods_phase_1_110_R_C_stiff.png" style="width: 45%;" />
+</a>
+<p>So we see how for still small time steps like <span class="math notranslate nohighlight">\(\delta t = 0.001\)</span>, the Explicit Euler is already exploding and therefore should not be used for such problems.
+As for the other methods they show good behavior and for larger time steps we see some unnatural oscillations in the beginning for the Crank Nicholson method, while the implicit Euler gives more accurate results since it is A and L stable.
+Again for larger time steps, the oscillations are not fully resolved and we loose accuracy.</p>
 </section>
 
     <script type="text/x-thebe-config">
@@ -458,15 +539,6 @@ For the Explicit and Implicit Euler, we see even for very small time steps, that
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
-    <a class="left-prev"
-       href="intro.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Welcome to ASC-ODE’s documentation!</p>
-      </div>
-    </a>
 </div>
                 </footer>
               

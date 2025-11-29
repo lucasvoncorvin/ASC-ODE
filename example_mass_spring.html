@@ -6,8 +6,9 @@
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; ASC-ODE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Mass-Spring System &#8212; ASC-ODE</title>
   
   
   
@@ -56,9 +57,13 @@
     <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
-    <link rel="index" title="Index" href="#" />
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'example_mass_spring';</script>
+    <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Electric Network" href="example_electric_network.html" />
+    <link rel="prev" title="Examples" href="examples.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -121,8 +126,6 @@
       
       
       
-        
-      
       <div class="bd-sidebar-primary bd-sidebar">
         
 
@@ -178,10 +181,10 @@
                 </a>
             </li>
         </ul>
-        <ul class="nav bd-sidenav">
+        <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="solving_ODEs.html">Solving ODEs</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="example_mass_spring.html">Mass-Spring System</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="examples.html">Examples</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Mass-Spring System</a></li>
 <li class="toctree-l2"><a class="reference internal" href="example_electric_network.html">Electric Network</a></li>
 <li class="toctree-l2"><a class="reference internal" href="example_runge_kutta.html">Runge Kutta</a></li>
 </ul>
@@ -246,6 +249,54 @@
 
 
 
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/example_mass_spring.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
 <button onclick="toggleFullScreen()"
   class="btn btn-sm btn-fullscreen-button"
   title="Fullscreen mode"
@@ -290,7 +341,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1></h1>
+    <h1>Mass-Spring System</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -304,13 +355,104 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
+  <section class="tex2jax_ignore mathjax_ignore" id="mass-spring-system">
+<h1>Mass-Spring System<a class="headerlink" href="#mass-spring-system" title="Link to this heading">#</a></h1>
+<p>We are given the mass-spring relation, which is given by the following equation:
+<span class="math notranslate nohighlight">\(m y''(t) = -k y(t)\)</span>
+, where <span class="math notranslate nohighlight">\(m\)</span> is the mass and k the spring constant. This is an ODE of second order, so first we need to rewrite it  as a problem of first order:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+y_0' &amp;= y_1, \\
+y_1' &amp;= -\frac{k}{m} y_0 .
+\end{aligned}
+\end{split}\]</div>
+<p>Now we have a 2-dimensional system that can be written as <span class="math notranslate nohighlight">\(y'(t) = f(t,y(t))\)</span> or, in that specific case, it is an autonomous system, so <span class="math notranslate nohighlight">\(f = f(y(t))\)</span> only.
+Before looking into the numerical schemes, we should analyse what solution we should expect from this problem. If we look at the system, it becomes clear that it is a Hamiltonian system, and therefore, we expect a solution that is conservative with respect to time. Also, if we study the system as a matrix system, we get imaginary eigenvalues with real part = 0. This indicates that the solution of the system must be closed circles in a phase plot.</p>
+<p>In the following, we will investigate 4 different methods:
+Explicit Euler, Explicit Midpoint Rule (Runge Kutta 2), Implicit Euler, and Crank-Nicolson Method.
+Each of them was presented in the lecture.
+For the implicit methods, we need to use Newton’s method in order to solve for the next time step, since it involves solving an implicit equation.
+This method has also been presented in class and is basically calculating the 0 of a given function by using Taylor expansion.
+For the explicit Euler, we expect trajectories spiraling outwards, since it is not a symplectic integrator and the energy increases, s.t <span class="math notranslate nohighlight">\(E_{n+1} \ge E_n\)</span>.
+For smaller time steps, this effect will be expected to be less strong.</p>
+<p>For the implicit Euler, we expect the opposite effect, trajectories spiraling inwards. This is due to the fact that it is also not a symplectic integrator and it adds artificial damping to the system s.t <span class="math notranslate nohighlight">\(E_{n+1} \le E_n\)</span>.</p>
+<p>For the explicit midpoint scheme, we expect better rates of convergence because it is a second-order method, compared to the other Euler methods. For the Crank-Nicolson scheme, we expect good results, because it can match the behavior of linear Hamiltonians very accurate, therefore, we expect almost perfectly closed circles even for smaller time steps.
+The simulation goes from <span class="math notranslate nohighlight">\(t_0=0\)</span> until <span class="math notranslate nohighlight">\(t_{end}=4 \pi\)</span></p>
+<p>Explicit Euler 20 time steps</p>
+<a class="reference internal image-reference" href="_images/time_evolution_20.png"><img alt="_images/time_evolution_20.png" src="_images/time_evolution_20.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/phase_plot_20.png"><img alt="_images/phase_plot_20.png" src="_images/phase_plot_20.png" style="width: 45%;" />
+</a>
+<p>Implicit Euler 20 time steps</p>
+<a class="reference internal image-reference" href="_images/time_evolution_20_IE.png"><img alt="_images/time_evolution_20_IE.png" src="_images/time_evolution_20_IE.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/phase_plot_20_IE.png"><img alt="_images/phase_plot_20_IE.png" src="_images/phase_plot_20_IE.png" style="width: 45%;" />
+</a>
+<p>Improved Euler 20 time steps</p>
+<a class="reference internal image-reference" href="_images/time_evolution_20_RK2.png"><img alt="_images/time_evolution_20_RK2.png" src="_images/time_evolution_20_RK2.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/phase_plot_20_RK2.png"><img alt="_images/phase_plot_20_RK2.png" src="_images/phase_plot_20_RK2.png" style="width: 45%;" />
+</a>
+<p>Crank-Nicolson 20 time steps</p>
+<a class="reference internal image-reference" href="_images/time_evolution_20_CN.png"><img alt="_images/time_evolution_20_CN.png" src="_images/time_evolution_20_CN.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/phase_plot_20_CN.png"><img alt="_images/phase_plot_20_CN.png" src="_images/phase_plot_20_CN.png" style="width: 45%;" />
+</a>
+<p>Explicit Euler 100 time steps</p>
+<a class="reference internal image-reference" href="_images/time_evolution_100.png"><img alt="_images/time_evolution_100.png" src="_images/time_evolution_100.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/phase_plot_100.png"><img alt="_images/phase_plot_100.png" src="_images/phase_plot_100.png" style="width: 45%;" />
+</a>
+<p>Implicit Euler 100 time steps</p>
+<a class="reference internal image-reference" href="_images/time_evolution_100_IE.png"><img alt="_images/time_evolution_100_IE.png" src="_images/time_evolution_100_IE.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/phase_plot_100_IE.png"><img alt="_images/phase_plot_100_IE.png" src="_images/phase_plot_100_IE.png" style="width: 45%;" />
+</a>
+<p>Improved Euler 100 time steps</p>
+<a class="reference internal image-reference" href="_images/time_evolution_100_RK2.png"><img alt="_images/time_evolution_100_RK2.png" src="_images/time_evolution_100_RK2.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/phase_plot_100_RK2.png"><img alt="_images/phase_plot_100_RK2.png" src="_images/phase_plot_100_RK2.png" style="width: 45%;" />
+</a>
+<p>Crank-Nicolson 100 time steps</p>
+<a class="reference internal image-reference" href="_images/time_evolution_100_CN.png"><img alt="_images/time_evolution_100_CN.png" src="_images/time_evolution_100_CN.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/phase_plot_100_CN.png"><img alt="_images/phase_plot_100_CN.png" src="_images/phase_plot_100_CN.png" style="width: 45%;" />
+</a>
+<p>Explicit Euler 1000 time steps</p>
+<a class="reference internal image-reference" href="_images/time_evolution_1000.png"><img alt="_images/time_evolution_1000.png" src="_images/time_evolution_1000.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/phase_plot_1000.png"><img alt="_images/phase_plot_1000.png" src="_images/phase_plot_1000.png" style="width: 45%;" />
+</a>
+<p>Implicit Euler 1000 time steps</p>
+<a class="reference internal image-reference" href="_images/time_evolution_1000_IE.png"><img alt="_images/time_evolution_1000_IE.png" src="_images/time_evolution_1000_IE.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/phase_plot_1000_IE.png"><img alt="_images/phase_plot_1000_IE.png" src="_images/phase_plot_1000_IE.png" style="width: 45%;" />
+</a>
+<p>The results confirm the expectations. For large time steps, the implicit and explicit Euler are either exploding (Explicit) or totally decaying (Implicit). For the improved Euler, we see a slight increase of the energy for larger time steps but as soon as the time steps decrease enough, the solution becomes quite accurate, and we observe a closed circle.
+For the Crank-Nicholson method, we observe already for very large time steps that the energy stays conserved, no increasing of amplitude or spiraling outwards in the phase plot. This is expected since it can represent the energy conservation pretty accurate for linear Hamiltonians.
+For the Explicit and Implicit Euler, we see even for very small time steps, that the drift away from the equilibrium stays visible.</p>
+</section>
 
-<h1 id="index">Index</h1>
-
-<div class="genindex-jumpbox">
- 
-</div>
-
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
 
                 </article>
               
@@ -322,6 +464,24 @@ document.write(`
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="examples.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Examples</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="example_electric_network.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Electric Network</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
 </div>
                 </footer>
               

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Intro &#8212; ASC-ODE</title>
+    <title>Electric Network &#8212; ASC-ODE</title>
   
   
   
@@ -59,10 +59,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'intro';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'example_electric_network';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Solving ODEs" href="solving_ODEs.html" />
+    <link rel="next" title="Runge Kutta" href="example_runge_kutta.html" />
+    <link rel="prev" title="Mass-Spring System" href="example_mass_spring.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -125,8 +126,6 @@
       
       
       
-        
-      
       <div class="bd-sidebar-primary bd-sidebar">
         
 
@@ -145,7 +144,7 @@
     
   
 
-<a class="navbar-brand logo" href="#">
+<a class="navbar-brand logo" href="intro.html">
   
   
   
@@ -176,17 +175,17 @@
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
-            <li class="toctree-l1 current active">
-                <a class="reference internal" href="#">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
                     Intro
                 </a>
             </li>
         </ul>
-        <ul class="nav bd-sidenav">
+        <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="solving_ODEs.html">Solving ODEs</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="examples.html">Examples</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="example_mass_spring.html">Mass-Spring System</a></li>
-<li class="toctree-l2"><a class="reference internal" href="example_electric_network.html">Electric Network</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Electric Network</a></li>
 <li class="toctree-l2"><a class="reference internal" href="example_runge_kutta.html">Runge Kutta</a></li>
 </ul>
 </details></li>
@@ -260,7 +259,7 @@
       
       
       
-      <li><a href="_sources/intro.md" target="_blank"
+      <li><a href="_sources/example_electric_network.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -331,9 +330,7 @@ document.write(`
   </button>
 `);
 </script>
-<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="fa-solid fa-list"></span>
-</button>
+
 </div></div>
       
     </div>
@@ -344,20 +341,11 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Intro</h1>
+    <h1>Electric Network</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
-            <div>
-                <h2> Contents </h2>
-            </div>
-            <nav aria-label="Page">
-                <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#available-time-stepping-methods-are">Available time-stepping methods are</a></li>
-</ul>
-            </nav>
         </div>
     </div>
 </div>
@@ -367,73 +355,80 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="intro">
-<h1>Intro<a class="headerlink" href="#intro" title="Link to this heading">#</a></h1>
-<p>ASC-ODE is is a C++ library for solving ordinary differential equations (ODEs).
-This is is the documentation of the implementation created by Team 3.
-The equation is defined by the right hand side function.
-ASC-ODE provides various time-steppers which may be used for odes with right hand sides
-given by a function object.</p>
-<p>A small demo for solving a mass-spring model as first order ODE</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="electric-network">
+<h1>Electric Network<a class="headerlink" href="#electric-network" title="Link to this heading">#</a></h1>
+<p>We want to model an electric network with an ODE. We are given a Voltage source <span class="math notranslate nohighlight">\(U_0 = cos(100 \pi t)\)</span>. We are given the variables <span class="math notranslate nohighlight">\(R\)</span> for the resistance and <span class="math notranslate nohighlight">\(C\)</span> for the capacity.
+The system can be written as :</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-y_0^\prime &amp;= y_1 \\
-y_1^\prime &amp;= -\frac{k}{m} y_0
+U_c(t) + RC\frac{dU_c}{dt} &amp;= U_0(t), \\
+\frac{dU_c}{dt} &amp;= -\frac{U_c(t)}{RC} + \frac{U_0(t)}{RC}.
 \end{aligned}
 \end{split}\]</div>
-<p>is here:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">double</span><span class="w"> </span><span class="n">tend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="o">*</span><span class="n">M_PI</span><span class="p">;</span>
-<span class="kt">int</span><span class="w"> </span><span class="n">steps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span>
-<span class="kt">double</span><span class="w"> </span><span class="n">tau</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tend</span><span class="o">/</span><span class="n">steps</span><span class="p">;</span>
-
-<span class="n">Vector</span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">};</span><span class="w">  </span><span class="c1">// initial conditions</span>
-<span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">NonlinearFunction</span><span class="o">&gt;</span><span class="w"> </span><span class="n">rhs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">MassSpring</span><span class="o">&gt;</span><span class="p">(</span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="n">stiffness</span><span class="p">);</span>
-<span class="w">  </span>
-<span class="n">ExplicitEuler</span><span class="w"> </span><span class="nf">stepper</span><span class="p">(</span><span class="n">rhs</span><span class="p">);</span>
-
-<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mf">0.0</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;  &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">y</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">y</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">steps</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span>
-<span class="w">  </span><span class="p">{</span>
-<span class="w">     </span><span class="n">stepper</span><span class="p">.</span><span class="n">DoStep</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">);</span>
-<span class="w">     </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">tau</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;  &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">y</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">y</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-<span class="w">  </span><span class="p">}</span>
-</pre></div>
-</div>
-<p>The result of this simulation in phase space is shown here:</p>
-<a class="reference internal image-reference" href="_images/massspring_phase.png"><img alt="_images/massspring_phase.png" class="align-center" src="_images/massspring_phase.png" style="width: 40%;" />
+<p>So we can see our system is decomposed into a decaying exponential solution and oscillatory solution.
+The decay of the exponential solution is hereby determined by the term <span class="math notranslate nohighlight">\(\frac{-1}{RC}\)</span>. If <span class="math notranslate nohighlight">\(RC\)</span> becomes small the transient behaviour vanishes very quickly.
+We can solve the system and compute exact solution by splitting into homogeneous and particular solution and define <span class="math notranslate nohighlight">\(\tau = RC\)</span> and <span class="math notranslate nohighlight">\(\omega = 100 pi\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[
+U_C(t)=-\frac{1}{1+(\tau\omega)^2} e^{-t/\tau}+\frac{1}{1+(\tau\omega)^2}\cos(\omega t)+\frac{\tau\omega}{1+(\tau\omega)^2}\sin(\omega t).
+\]</div>
+<p>In the first test case, we set <span class="math notranslate nohighlight">\(R=C=1\)</span>. Therefore we expect visible decay of the amplitude of the oscillations and we expect similar results for all methods, where explicit might overshoot and implicit might undershoot amplitudes.
+Since our stationary frequency is given by <span class="math notranslate nohighlight">\(f = 100 \pi / 2 pi = 50 Hz\)</span>, our period <span class="math notranslate nohighlight">\(T = 0.02s\)</span>, our time step should be small enough to detect oscillatory behavior. We run the simulation from <span class="math notranslate nohighlight">\(t_0 = 0\)</span> to <span class="math notranslate nohighlight">\(t_{end} = 5s\)</span>.
+So we expect for <span class="math notranslate nohighlight">\(N \geq t_{total}/\Delta t = 5/0.02 = 250\)</span>, that we see some oscillatory behavior.
+And in general we expect to see mostly a sinusoidal function since the prefactor of the exponential and the cosinus are two orders lower then the prefactor of the sine term.</p>
+<p>5000 time steps</p>
+<a class="reference internal image-reference" href="_images/rc_methods_time_5000_R_C_1.png"><img alt="_images/rc_methods_time_5000_R_C_1.png" src="_images/rc_methods_time_5000_R_C_1.png" style="width: 45%;" />
 </a>
-<section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h2>
-<p>install via git-clone:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/lucasvoncorvin/ASC-ODE.git
-</pre></div>
-</div>
-<p>To configure and build some tests do</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>cd ASC-ODE
-mkdir build
-cd build
-cmake ..
-make
-</pre></div>
-</div>
-</section>
-<section id="available-time-stepping-methods-are">
-<h2>Available time-stepping methods are<a class="headerlink" href="#available-time-stepping-methods-are" title="Link to this heading">#</a></h2>
-<ul class="simple">
-<li><p>Explicit Euler</p></li>
-<li><p>Implicit Euler</p></li>
-<li><p>Explicit Runge-Kutta</p>
-<ul>
-<li><p>Runge-Kutta 2</p></li>
-</ul>
-</li>
-<li><p>Implicit Runge-Kutta</p></li>
-<li><p>Cranck-Nicolson</p></li>
-</ul>
-</section>
-<div class="toctree-wrapper compound">
-</div>
+<a class="reference internal image-reference" href="_images/rc_methods_phase_5000_R_C_1.png"><img alt="_images/rc_methods_phase_5000_R_C_1.png" src="_images/rc_methods_phase_5000_R_C_1.png" style="width: 45%;" />
+</a>
+<p>1000 time steps</p>
+<a class="reference internal image-reference" href="_images/rc_methods_time_5_1000_R_C_1.png"><img alt="_images/rc_methods_time_5_1000_R_C_1.png" src="_images/rc_methods_time_5_1000_R_C_1.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/rc_methods_phase_5_1000_R_C_1.png"><img alt="_images/rc_methods_phase_5_1000_R_C_1.png" src="_images/rc_methods_phase_5_1000_R_C_1.png" style="width: 45%;" />
+</a>
+<p>200 time steps</p>
+<a class="reference internal image-reference" href="_images/rc_methods_time_5_200_R_C_1.png"><img alt="_images/rc_methods_time_5_200_R_C_1.png" src="_images/rc_methods_time_5_200_R_C_1.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/rc_methods_phase_5_200_R_C_1.png"><img alt="_images/rc_methods_phase_5_200_R_C_1.png" src="_images/rc_methods_phase_5_200_R_C_1.png" style="width: 45%;" />
+</a>
+<p>50 time steps</p>
+<a class="reference internal image-reference" href="_images/rc_methods_time_5_50_R_C_1.png"><img alt="_images/rc_methods_time_5_50_R_C_1.png" src="_images/rc_methods_time_5_50_R_C_1.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/rc_methods_phase_5_50_R_C_1.png"><img alt="_images/rc_methods_phase_5_50_R_C_1.png" src="_images/rc_methods_phase_5_50_R_C_1.png" style="width: 45%;" />
+</a>
+<p>By analyzing the results, it becomes clear that the explicit Euler is underdamping, gives higher values first and then slowly decays to the stationary oscillating solution. The implicit Euler will give lower values and also decay to the stationary oscillating solution. As for the Crank Nicolson, we don’t see numerical damping so we only see the stationary solution which is oscillating.
+For larger time steps, for example <span class="math notranslate nohighlight">\(N=200\)</span>, we already see that the amplitudes are increasing and we don’t fully recover the oscillations, which completely die out when we only use <span class="math notranslate nohighlight">\(N=50\)</span>.
+So for small time steps, the Crank Nicholson recovers the behavior of the true solution the most, and our time steps should in general be small enough s.t we can recover the oscillations.</p>
+<p>Next we look into the second case, where <span class="math notranslate nohighlight">\(RC = 10^{-4}\)</span>, therefore the homogeneus solution is now modelled by a “stiff ODE”, because its transient response is vanishing really quick. This has some implications on the different methods. In general, the Explicit Euler should not be used for such models due to the nature of its stability function. For such high eigenvalues, we need really small time steps to be in a stable regime. In that case, we should expect exploding solutions for the Explicit Euler for <span class="math notranslate nohighlight">\(N \leq 10^4/2\)</span>. For the other two methods, they should remain always stable, since <span class="math notranslate nohighlight">\(\lambda \leq 0\)</span>. This time, we only simulate for <span class="math notranslate nohighlight">\(1s\)</span>. and the solution should be dominated by the cosine term this time, with the explonential decaying “quasi immediately”.</p>
+<p>5000 time steps</p>
+<a class="reference internal image-reference" href="_images/rc_methods_time_1_10000_R_C_stiff.png"><img alt="_images/rc_methods_time_1_10000_R_C_stiff.png" src="_images/rc_methods_time_1_10000_R_C_stiff.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/rc_methods_phase_1_10000_R_C_stiff.png"><img alt="_images/rc_methods_phase_1_10000_R_C_stiff.png" src="_images/rc_methods_phase_1_10000_R_C_stiff.png" style="width: 45%;" />
+</a>
+<p>1000 time steps with Explicit Euler</p>
+<a class="reference internal image-reference" href="_images/rc_methods_time_1_1000_R_C_stiff.png"><img alt="_images/rc_methods_time_1_1000_R_C_stiff.png" src="_images/rc_methods_time_1_1000_R_C_stiff.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/rc_methods_phase_1_1000_R_C_stiff.png"><img alt="_images/rc_methods_phase_1_1000_R_C_stiff.png" src="_images/rc_methods_phase_1_1000_R_C_stiff.png" style="width: 45%;" />
+</a>
+<p>1000 time steps without Explicit Euler</p>
+<a class="reference internal image-reference" href="_images/rc_methods_time_1_1000_R_C_stiff_woEE.png"><img alt="_images/rc_methods_time_1_1000_R_C_stiff_woEE.png" src="_images/rc_methods_time_1_1000_R_C_stiff_woEE.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/rc_methods_phase_1_1000_R_C_stiff_woEE.png"><img alt="_images/rc_methods_phase_1_1000_R_C_stiff_woEE.png" src="_images/rc_methods_phase_1_1000_R_C_stiff_woEE.png" style="width: 45%;" />
+</a>
+<p>200 time steps</p>
+<a class="reference internal image-reference" href="_images/rc_methods_time_1_200_R_C_stiff_woEE.png"><img alt="_images/rc_methods_time_1_200_R_C_stiff_woEE.png" src="_images/rc_methods_time_1_200_R_C_stiff_woEE.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/rc_methods_phase_1_200_R_C_stiff.png"><img alt="_images/rc_methods_phase_1_200_R_C_stiff.png" src="_images/rc_methods_phase_1_200_R_C_stiff.png" style="width: 45%;" />
+</a>
+<p>110 time steps</p>
+<a class="reference internal image-reference" href="_images/rc_methods_time_1_110_R_C_stiff_woEE.png"><img alt="_images/rc_methods_time_1_110_R_C_stiff_woEE.png" src="_images/rc_methods_time_1_110_R_C_stiff_woEE.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/rc_methods_phase_1_110_R_C_stiff.png"><img alt="_images/rc_methods_phase_1_110_R_C_stiff.png" src="_images/rc_methods_phase_1_110_R_C_stiff.png" style="width: 45%;" />
+</a>
+<p>So we see how for still small time steps like <span class="math notranslate nohighlight">\(\delta t = 0.001\)</span>, the Explicit Euler is already exploding and therefore should not be used for such problems.
+As for the other methods they show good behavior and for larger time steps we see some unnatural oscillations in the beginning for the Crank Nicholson method, while the implicit Euler gives more accurate results since it is A and L stable.
+Again for larger time steps, the oscillations are not fully resolved and we loose accuracy.</p>
 </section>
 
     <script type="text/x-thebe-config">
@@ -466,12 +461,21 @@ make
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="example_mass_spring.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Mass-Spring System</p>
+      </div>
+    </a>
     <a class="right-next"
-       href="solving_ODEs.html"
+       href="example_runge_kutta.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Solving ODEs</p>
+        <p class="prev-next-title">Runge Kutta</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -481,22 +485,6 @@ make
             </div>
             
             
-              
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
-
-
-  <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> Contents
-  </div>
-  <nav class="bd-toc-nav page-toc">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#available-time-stepping-methods-are">Available time-stepping methods are</a></li>
-</ul>
-  </nav></div>
-
-</div></div>
               
             
           </div>
