@@ -57,10 +57,10 @@ public:
 int main()
 {
     double R = 100.0;
-    double C = 1e-6;
+    double C = 1.0e-6;
 
     double t_end = 1;
-    int steps = 100;
+    int steps = 50;
     double tau = t_end / steps;
 
     // RHS

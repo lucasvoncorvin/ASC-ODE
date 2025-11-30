@@ -1,16 +1,21 @@
-# Welcome to ASC-ODE's documentation!
+# Intro
 
 
-ASC-ODE is is a C++ library for solving ordinary differential equations (ODEs).
+ASC-ODE is is a C++ library for solving ordinary differential equations (ODEs). 
+This is is the documentation of the implementation created by Team 3.
 The equation is defined by the right hand side function.
 ASC-ODE provides various time-steppers which may be used for odes with right hand sides
 given by a function object.
 
 A small demo for solving a mass-spring model as first order ODE
-\begin{eqnarray*}
-y_0^\prime & = & y_1 \\
-y_1^\prime & = & -\frac{k}{m} y_0
-\end{eqnarray*}
+
+$$
+\begin{aligned}
+y_0^\prime &= y_1 \\
+y_1^\prime &= -\frac{k}{m} y_0
+\end{aligned}
+$$
+
 is here:
 
 ```cpp
@@ -39,18 +44,16 @@ The result of this simulation in phase space is shown here:
 ```
 
 
-
-
 ## Installation
 
-install XXX-odesolver it via git-clone:
+install via git-clone:
 
-    git clone https://github.com/my-github-clone/my-ode-solver.git
+    git clone https://github.com/lucasvoncorvin/ASC-ODE.git
 
 
 To configure and build some tests do
 
-    cd my-ode-solver
+    cd ASC-ODE
     mkdir build
     cd build
     cmake ..
@@ -58,7 +61,12 @@ To configure and build some tests do
     
 
 ## Available time-stepping methods are
-...
+- Explicit Euler
+- Implicit Euler
+- Explicit Runge-Kutta
+  - Runge-Kutta 2 (Improved Euler)
+- Implicit Runge-Kutta
+- Cranck-Nicolson
 
 
 

@@ -1,9 +1,7 @@
-# Report
+# Mass-Spring System
 
-This report will discuss several topics while dealing with the analysis of specific problems that can be modelled using ODEs and solving them numerically with different methods.
-Such methods are usually obtained by integrating the ODE and using numerical integration on the given function $f(t,y(t))$.
 
-In the first example, we are given the mass-spring relation, which is given by the following equation:
+We are given the mass-spring relation, which is given by the following equation:
 $m y''(t) = -k y(t)$
 , where $m$ is the mass and k the spring constant. This is an ODE of second order, so first we need to rewrite it  as a problem of first order:
 
@@ -113,30 +111,3 @@ Implicit Euler 1000 time steps
 The results confirm the expectations. For large time steps, the implicit and explicit Euler are either exploding (Explicit) or totally decaying (Implicit). For the improved Euler, we see a slight increase of the energy for larger time steps but as soon as the time steps decrease enough, the solution becomes quite accurate, and we observe a closed circle.
 For the Crank-Nicholson method, we observe already for very large time steps that the energy stays conserved, no increasing of amplitude or spiraling outwards in the phase plot. This is expected since it can represent the energy conservation pretty accurate for linear Hamiltonians.
 For the Explicit and Implicit Euler, we see even for very small time steps, that the drift away from the equilibrium stays visible.
-
-This part of the report summarizes the implementation and testing of an automatic differentiation (AutoDiff) class applied to two problems: solving the pendulum ODE and evaluating Legendre polynomials with their derivatives. Automatic differentiation provides exact derivatives without numerical approximation errors.
-
-The AutoDiff class template stores both values and derivatives, with comprehensive operator overloading for basic arithmetic:
-
--Addition, subtraction, multiplication, and division operators
--Support for AutoDiff-AutoDiff and constant-AutoDiff combinations
--Proper implementation of derivative rules (product rule, quotient rule)
-
-Moreover we extended for the eelementary functions: sin, cos, exp, log.
-
-In the other hand The pendulum equation $\alpha'' = -\frac{g}{l}\sin(\alpha)$ was reformulated as a first-order system:
-$y_0' &= y_1$
-$y_1' &= -\frac{g}{l}\sin(y_0)$
-
-Testing with initial condition $[\pi/4, 0.1]$ gave:
-
-Function: $f(x) = [0.1, -0.567669]$
-Jacobian: $\begin{bmatrix} 0 & 1 \\ -0.800633 & 0 \end{bmatrix}$
-
-The Jacobian matches the analytical solution, confirming correct derivative computation.
-
-Legendre polynomials were evaluated using their recursive definition as it was defined.
-
-The AutoDiff implementation automatically computes both polynomial values and their derivatives. Polynomials up to order 5 were evaluated over $[-1, 1]$, with derivatives computed accurately through the automatic differentiation mechanism.
-
-```{image} ../demos/legendre_plot.png
