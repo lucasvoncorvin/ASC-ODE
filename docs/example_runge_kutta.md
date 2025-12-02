@@ -58,6 +58,7 @@ Now we look at the Electric Circuit model. Again we start by choosing $R=C=1$ an
 ```
 ```{image} ../demos/plots_RK_RC/phase_plot_U_dU_1_500.png
 :width: 45%
+```
 
 We see, for the larger time step, the exponential decay is not visible and the RK4 method gives higher amplitudes. For smaller time steps, we see already accurate solutions as the exponential decay is visible.
 
@@ -85,6 +86,7 @@ Now we will look at the stiff Problem. Again we expect exploding solutions for t
 ```
 ```{image} ../demos/plots_RK_RC/phase_plot_U_dU_stiff_200.png
 :width: 45%
+```
 
 We observe exploding results of the explicit method and accurate results for the implicit methods already for larger time steps. For N = 1000, we see very accurate behavior.
 To conclude, we can say, that choosing higher order Runge Kutta Methods is recommended due to its higher convergence rates. For non stiff problems and a sufficient time step, the RK4 gives already very accurate solutions and might be preferred due to its lower computational costs compared to the implicit methods. However, for stiff problems, one should always choose an implicit method due to stability.
