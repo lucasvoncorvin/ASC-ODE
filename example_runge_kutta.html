@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -57,10 +57,12 @@
     <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'example_runge_kutta';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Useful Classes" href="other_stuff.html" />
+    <link rel="next" title="Autodiff" href="example_autodiff.html" />
     <link rel="prev" title="Electric Network" href="example_electric_network.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -175,16 +177,20 @@
         <ul class="nav bd-sidenav bd-sidenav__home-link">
             <li class="toctree-l1">
                 <a class="reference internal" href="intro.html">
-                    Welcome to the documentation of the ASC-ODE libray implemented by Team 03!
+                    Intro
                 </a>
             </li>
         </ul>
         <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="solving_ODEs.html">Solving ODEs</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="solving_ODEs.html">Solving ODEs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="runge_kutta_timesteppers.html">General Runge Kutta</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="examples.html">Examples</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="example_mass_spring.html">Mass-Spring System</a></li>
 <li class="toctree-l2"><a class="reference internal" href="example_electric_network.html">Electric Network</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Runge Kutta</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_autodiff.html">Autodiff</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="other_stuff.html">Useful Classes</a></li>
@@ -355,6 +361,66 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="runge-kutta">
 <h1>Runge Kutta<a class="headerlink" href="#runge-kutta" title="Link to this heading">#</a></h1>
+<p>In this section we will now investigate the implementation of 3 different Runge Kutta Schemes for the past problems as the Mass Spring and the Electric Circuit models.
+In general, all the methods that were already discussed, as the Explicit/ Implicit Euler and also the improved Euler as well as the Crank Nicolson method, can be formulated as Runge Kutta methods.
+They have convergence order 1 and 2. Therefore we aim to investigate higher order methods. In Runge Kutta methods, each time step is divided into an amount of stages m and therefore each time steps is resolved at a higher accuracy which depends on the number of stages. For convergence, there are different rules regarding the method. For explicit Runge Kutta schemes there exists the rule that the order of convergence <span class="math notranslate nohighlight">\(p leq m\)</span>. However for <span class="math notranslate nohighlight">\(m \beq 5\)</span> it has not been possible to recover <span class="math notranslate nohighlight">\(p=m\)</span>. Therefore, a very popular method is the Runge Kutta 4 Explicit which has order 4 convergence.
+In general the order of convergence is equivalent to the order of accuracy of the numerical integration. Therefore, for implicit methods, it becomes clear, that choosing Gauss integration methods will leas to the highest convergence rates of order <span class="math notranslate nohighlight">\(p=2m\)</span>.
+For implcit RK methods the rule is <span class="math notranslate nohighlight">\(p \leq 2m\)</span>. Another popular method is the Radau method, which has oder <span class="math notranslate nohighlight">\(p = 2m-1\)</span>, where the last coefficient <span class="math notranslate nohighlight">\(c_m =1\)</span> is fixed.
+Therefore we chose to investigate the following three methods:</p>
+<ul class="simple">
+<li><p>Runge Kutta 4 Explicit - p = 4</p></li>
+<li><p>Gauss Method m = 4     - p = 8</p></li>
+<li><p>Radau Method m = 4     - p = 7</p></li>
+</ul>
+<p>We expect accurate solutions for larger time steps already, as well as for the stiff problem, we expect exploding solutions for the explicit method.</p>
+<p>Mass Spring Model</p>
+<p>40 time steps</p>
+<a class="reference internal image-reference" href="_images/time_evolution_position_40.png"><img alt="_images/time_evolution_position_40.png" src="_images/time_evolution_position_40.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/phase_plot_40.png"><img alt="_images/phase_plot_40.png" src="_images/phase_plot_40.png" style="width: 45%;" />
+</a>
+<p>20 time steps</p>
+<a class="reference internal image-reference" href="_images/time_evolution_position_20.png"><img alt="_images/time_evolution_position_20.png" src="_images/time_evolution_position_20.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/phase_plot_201.png"><img alt="_images/phase_plot_201.png" src="_images/phase_plot_201.png" style="width: 45%;" />
+</a>
+<p>10 time steps</p>
+<a class="reference internal image-reference" href="_images/time_evolution_position_10.png"><img alt="_images/time_evolution_position_10.png" src="_images/time_evolution_position_10.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/phase_plot_10.png"><img alt="_images/phase_plot_10.png" src="_images/phase_plot_10.png" style="width: 45%;" />
+</a>
+<p>As expected, we see already for very large time scales, that the oscillations of the system are represented quite well and for N = 40, we already get perfect circles for the phase plot.
+This is due to higher convergence rates. For the largest time step, we can also see difference in the lower order method of the Explicit method, that shows less accurate behavior.</p>
+<p>Now we look at the Electric Circuit model. Again we start by choosing <span class="math notranslate nohighlight">\(R=C=1\)</span> and we expect similar behavior to the one observed by the implicit Euler, where the transient solution will disappear after a few seconds.</p>
+<p>200 time steps</p>
+<a class="reference internal image-reference" href="_images/UC_time_evolution_1_200.png"><img alt="_images/UC_time_evolution_1_200.png" src="_images/UC_time_evolution_1_200.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/phase_plot_U_dU_1_200.png"><img alt="_images/phase_plot_U_dU_1_200.png" src="_images/phase_plot_U_dU_1_200.png" style="width: 45%;" />
+</a>
+<p>500 time steps</p>
+<a class="reference internal image-reference" href="_images/UC_time_evolution_1_500.png"><img alt="_images/UC_time_evolution_1_500.png" src="_images/UC_time_evolution_1_500.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/phase_plot_U_dU_1_500.png"><img alt="_images/phase_plot_U_dU_1_500.png" src="_images/phase_plot_U_dU_1_500.png" style="width: 45%;" />
+</a>
+<p>We see, for the larger time step, the exponential decay is not visible and the RK4 method gives higher amplitudes. For smaller time steps, we see already accurate solutions as the exponential decay is visible.</p>
+<p>Now we will look at the stiff Problem. Again we expect exploding solutions for the RK4.</p>
+<p>1000 time steps</p>
+<a class="reference internal image-reference" href="_images/UC_time_evolution_stiff_1000.png"><img alt="_images/UC_time_evolution_stiff_1000.png" src="_images/UC_time_evolution_stiff_1000.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/phase_plot_U_dU_stiff_1000.png"><img alt="_images/phase_plot_U_dU_stiff_1000.png" src="_images/phase_plot_U_dU_stiff_1000.png" style="width: 45%;" />
+</a>
+<p>1000 time steps</p>
+<a class="reference internal image-reference" href="_images/UC_time_evolution_stiff_1000_NORK4.png"><img alt="_images/UC_time_evolution_stiff_1000_NORK4.png" src="_images/UC_time_evolution_stiff_1000_NORK4.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/phase_plot_U_dU_stiff_1000_NORK4.png"><img alt="_images/phase_plot_U_dU_stiff_1000_NORK4.png" src="_images/phase_plot_U_dU_stiff_1000_NORK4.png" style="width: 45%;" />
+</a>
+<p>200 time steps</p>
+<a class="reference internal image-reference" href="_images/UC_time_evolution_stiff_200.png"><img alt="_images/UC_time_evolution_stiff_200.png" src="_images/UC_time_evolution_stiff_200.png" style="width: 45%;" />
+</a>
+<a class="reference internal image-reference" href="_images/phase_plot_U_dU_stiff_200.png"><img alt="_images/phase_plot_U_dU_stiff_200.png" src="_images/phase_plot_U_dU_stiff_200.png" style="width: 45%;" />
+</a>
+<p>We observe exploding results of the explicit method and accurate results for the implicit methods already for larger time steps. For N = 1000, we see very accurate behavior.
+To conclude, we can say, that choosing higher order Runge Kutta Methods is recommended due to its higher convergence rates. For non stiff problems and a sufficient time step, the RK4 gives already very accurate solutions and might be preferred due to its lower computational costs compared to the implicit methods. However, for stiff problems, one should always choose an implicit method due to stability.</p>
 </section>
 
     <script type="text/x-thebe-config">
@@ -397,11 +463,11 @@ document.write(`
       </div>
     </a>
     <a class="right-next"
-       href="other_stuff.html"
+       href="example_autodiff.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Useful Classes</p>
+        <p class="prev-next-title">Autodiff</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
