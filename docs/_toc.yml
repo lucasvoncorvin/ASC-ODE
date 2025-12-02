@@ -12,6 +12,7 @@ chapters:
       - file: example_mass_spring.md
       - file: example_electric_network.md
       - file: example_runge_kutta.md
+      - file: example_autodiff.md
   - file: other_stuff.md
 
 
