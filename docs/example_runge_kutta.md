@@ -46,14 +46,14 @@ Now we look at the Electric Circuit model. Again we start by choosing $R=C=1$ an
 
 
 200 time steps
-```{image} ../demos/plots_RK_RC/UC_time_evolution_200.png
+```{image} ../demos/plots_RK_RC/UC_time_evolution_1_200.png
 :width: 45%
 ```
 ```{image} ../demos/plots_RK_RC/phase_plot_U_dU_1_200.png
 :width: 45%
 ```
 500 time steps
-```{image} ../demos/plots_RK_RC/UC_time_evolution_500.png
+```{image} ../demos/plots_RK_RC/UC_time_evolution_1_500.png
 :width: 45%
 ```
 ```{image} ../demos/plots_RK_RC/phase_plot_U_dU_1_500.png
