@@ -11,6 +11,7 @@ namespace py = pybind11;
 PYBIND11_MAKE_OPAQUE(std::vector<Mass<3>>);
 PYBIND11_MAKE_OPAQUE(std::vector<Fix<3>>);
 PYBIND11_MAKE_OPAQUE(std::vector<Spring>);
+PYBIND11_MAKE_OPAQUE(std::vector<Chain>);
 
 PYBIND11_MODULE(mass_spring, m) {
     m.doc() = "mass-spring-system simulator"; 
@@ -72,11 +73,18 @@ PYBIND11_MODULE(mass_spring, m) {
       .def_property_readonly("connectors",
                              [](Spring & s) { return s.connectors; })
       ;
+    
+    py::class_<Chain> (m, "Chain")
+      .def(py::init<double, double, std::array<Connector,2>>())
+      .def_property_readonly("connectors",
+                             [](Chain & c) { return c.connectors; })
+      ;
 
     
     py::bind_vector<std::vector<Mass<3>>>(m, "Masses3d");
     py::bind_vector<std::vector<Fix<3>>>(m, "Fixes3d");
-    py::bind_vector<std::vector<Spring>>(m, "Springs");        
+    py::bind_vector<std::vector<Spring>>(m, "Springs");    
+    py::bind_vector<std::vector<Chain>>(m, "Chains");    
     
     
     py::class_<MassSpringSystem<2>> (m, "MassSpringSystem2d")
@@ -97,9 +105,11 @@ PYBIND11_MODULE(mass_spring, m) {
       .def("add", [](MassSpringSystem<3> & mss, Mass<3> m) { return mss.addMass(m); })
       .def("add", [](MassSpringSystem<3> & mss, Fix<3> f) { return mss.addFix(f); })
       .def("add", [](MassSpringSystem<3> & mss, Spring s) { return mss.addSpring(s); })
+      .def("add", [](MassSpringSystem<3> & mss, Chain c) { return mss.addChain(c); })
       .def_property_readonly("masses", [](MassSpringSystem<3> & mss) -> auto& { return mss.masses(); })
       .def_property_readonly("fixes", [](MassSpringSystem<3> & mss) -> auto& { return mss.fixes(); })
       .def_property_readonly("springs", [](MassSpringSystem<3> & mss) -> auto& { return mss.springs(); })
+      .def_property_readonly("chains", [](MassSpringSystem<3> & mss) -> auto& { return mss.chains(); })
       .def("__getitem__", [](MassSpringSystem<3> mss, Connector & c) {
         if (c.type==Connector::FIX) return py::cast(mss.fixes()[c.nr]);
         else return py::cast(mss.masses()[c.nr]);
@@ -111,6 +121,23 @@ PYBIND11_MODULE(mass_spring, m) {
         Vector<> ddx(3*mss.masses().size());
         mss.getState (x, dx, ddx);
         return std::vector<double>(x);
+      })
+
+      .def("setState", [](MassSpringSystem<3> &mss,
+                    std::vector<std::array<double,3>> values,
+                    std::vector<std::array<double,3>> dvalues,
+                    std::vector<std::array<double,3>> ddvalues) {
+        Vector<> x(3*mss.masses().size());
+        Vector<> dx(3*mss.masses().size());
+        Vector<> ddx(3*mss.masses().size());
+        for (size_t i = 0; i < values.size(); ++i) {
+            for (int j = 0; j < 3; ++j) {
+                x[3*i+j] = values[i][j];
+                dx[3*i+j] = dvalues[i][j];
+                ddx[3*i+j] = ddvalues[i][j];
+            }
+        }
+        mss.setState(x, dx, ddx);
       })
 
       .def("simulate", [](MassSpringSystem<3> & mss, double tend, size_t steps) {

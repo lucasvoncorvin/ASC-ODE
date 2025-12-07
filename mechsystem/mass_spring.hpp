@@ -51,12 +51,21 @@ public:
   std::array<Connector,2> connectors;
 };
 
+class Chain
+{
+public:
+  double length;
+  double stiffness; // we approximate the chain by a very stiff spring when the constraints are enforced
+  std::array<Connector,2> connectors;
+};
+
 template <int D>
 class MassSpringSystem
 {
   std::vector<Fix<D>> m_fixes;
   std::vector<Mass<D>> m_masses;
   std::vector<Spring> m_springs;
+  std::vector<Chain> m_chains;
   Vec<D> m_gravity=0.0;
 public:
   void setGravity (Vec<D> gravity) { m_gravity = gravity; }
@@ -80,9 +89,16 @@ public:
     return m_springs.size()-1;
   }
 
+  size_t addChain (Chain c)
+  {
+    m_chains.push_back (c);
+    return m_chains.size()-1;
+  }
+
   auto & fixes() { return m_fixes; } 
   auto & masses() { return m_masses; } 
   auto & springs() { return m_springs; }
+  auto & chains() { return m_chains; }
 
   void getState (VectorView<> values, VectorView<> dvalues, VectorView<> ddvalues)
   {
@@ -128,6 +144,12 @@ std::ostream & operator<< (std::ostream & ost, MassSpringSystem<D> & mss)
   for (auto sp : mss.springs())
     ost << "length = " << sp.length << ", stiffness = " << sp.stiffness
         << ", C1 = " << sp.connectors[0] << ", C2 = " << sp.connectors[1] << std::endl;
+
+  ost << "chains: " << std::endl;
+  for (auto ch : mss.chains())
+    ost << "length = " << ch.length << ", stiffness = " << ch.stiffness
+        << ", C1 = " << ch.connectors[0] << ", C2 = " << ch.connectors[1] << std::endl;
+
   return ost;
 }
 
@@ -156,7 +178,7 @@ public:
     for (auto spring : mss.springs())
       {
         auto [c1,c2] = spring.connectors;
-        Vec<D> p1, p2;
+        Vec<D> p1, p2; // positions of the two endpoints of the spring
         if (c1.type == Connector::FIX)
           p1 = mss.fixes()[c1.nr].pos;
         else
@@ -173,7 +195,29 @@ public:
         if (c2.type == Connector::MASS)
           fmat.row(c2.nr) -= force*dir12;
       }
-
+    
+    for(auto chain : mss.chains()){
+        auto [c1,c2] = chain.connectors;
+        Vec<D> p1, p2; // positions of the two endpoints of the chain
+        if (c1.type == Connector::FIX)
+          p1 = mss.fixes()[c1.nr].pos;
+        else
+          p1 = xmat.row(c1.nr);
+        if (c2.type == Connector::FIX)
+          p2 = mss.fixes()[c2.nr].pos;
+        else
+          p2 = xmat.row(c2.nr);
+        
+        double force = 0.0;
+        if(norm(p1-p2) > chain.length){
+            force = chain.stiffness * (norm(p1-p2)-chain.length);
+            Vec<D> dir12 = 1.0/norm(p1-p2) * (p2-p1);
+            if (c1.type == Connector::MASS)
+              fmat.row(c1.nr) += force*dir12;
+            if (c2.type == Connector::MASS)
+              fmat.row(c2.nr) -= force*dir12;
+        }
+    }
     for (size_t i = 0; i < mss.masses().size(); i++)
       fmat.row(i) *= 1.0/mss.masses()[i].mass;
   }
