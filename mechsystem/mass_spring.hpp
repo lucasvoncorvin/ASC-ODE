@@ -59,6 +59,13 @@ public:
   std::array<Connector,2> connectors;
 };
 
+class DistanceConstraint
+{
+public:
+    double length;
+    std::array<Connector,2> connectors;
+};
+
 template <int D>
 class MassSpringSystem
 {
@@ -66,6 +73,8 @@ class MassSpringSystem
   std::vector<Mass<D>> m_masses;
   std::vector<Spring> m_springs;
   std::vector<Chain> m_chains;
+  std::vector<DistanceConstraint> m_constraints;
+
   Vec<D> m_gravity=0.0;
 public:
   void setGravity (Vec<D> gravity) { m_gravity = gravity; }
@@ -95,13 +104,25 @@ public:
     return m_chains.size()-1;
   }
 
+  
+
+  size_t addConstraint(DistanceConstraint c) {
+      m_constraints.push_back(c);
+      return m_constraints.size()-1;
+  }
+
+  
+
+
   auto & fixes() { return m_fixes; } 
   auto & masses() { return m_masses; } 
   auto & springs() { return m_springs; }
   auto & chains() { return m_chains; }
+  auto& constraints() { return m_constraints; }
 
   void getState (VectorView<> values, VectorView<> dvalues, VectorView<> ddvalues)
   {
+
     auto valmat = values.asMatrix(m_masses.size(), D);
     auto dvalmat = dvalues.asMatrix(m_masses.size(), D);
     auto ddvalmat = ddvalues.asMatrix(m_masses.size(), D);
@@ -150,9 +171,14 @@ std::ostream & operator<< (std::ostream & ost, MassSpringSystem<D> & mss)
     ost << "length = " << ch.length << ", stiffness = " << ch.stiffness
         << ", C1 = " << ch.connectors[0] << ", C2 = " << ch.connectors[1] << std::endl;
 
+  ost << "Constraints:\n";
+  for (auto c : mss.constraints())
+      ost << "L=" << c.length
+          << " C1=" << c.connectors[0]
+          << " C2=" << c.connectors[1] << "\n";
+
   return ost;
 }
-
 
 template <int D>
 class MSS_Function : public NonlinearFunction
@@ -162,17 +188,24 @@ public:
   MSS_Function (MassSpringSystem<D> & _mss)
     : mss(_mss) { }
 
-  virtual size_t dimX() const override { return D*mss.masses().size(); }
-  virtual size_t dimF() const override{ return D*mss.masses().size(); }
+    // unkowns: positions + constraints
+  virtual size_t dimX() const override { return D*mss.masses().size()+ mss.constraints().size(); }
+  virtual size_t dimF() const override{ return D*mss.masses().size()+ mss.constraints().size(); }
 
   virtual void evaluate (VectorView<double> x, VectorView<double> f) const override
   {
     f = 0.0;
 
-    auto xmat = x.asMatrix(mss.masses().size(), D);
-    auto fmat = f.asMatrix(mss.masses().size(), D);
+    size_t nm = mss.masses().size();
+    size_t nc = mss.constraints().size();
 
-    for (size_t i = 0; i < mss.masses().size(); i++)
+    // split x into coordinates and multipliers
+    auto xmat = x.range(0, nm*D).asMatrix(nm, D);
+    auto fmat = f.range(0, nm*D).asMatrix(nm, D);
+    auto lambda = x.range(nm*D, nm*D + nc);
+
+    // gravity
+    for (size_t i = 0; i < nm; i++)
       fmat.row(i) = mss.masses()[i].mass*mss.getGravity();
 
     for (auto spring : mss.springs())
@@ -190,6 +223,7 @@ public:
 
         double force = spring.stiffness * (norm(p1-p2)-spring.length);
         Vec<D> dir12 = 1.0/norm(p1-p2) * (p2-p1);
+
         if (c1.type == Connector::MASS)
           fmat.row(c1.nr) += force*dir12;
         if (c2.type == Connector::MASS)
@@ -218,8 +252,56 @@ public:
               fmat.row(c2.nr) -= force*dir12;
         }
     }
-    for (size_t i = 0; i < mss.masses().size(); i++)
-      fmat.row(i) *= 1.0/mss.masses()[i].mass;
+
+    // constraints: add G^T * lambda
+    for (size_t k = 0; k < nc; k++)
+      {
+        auto & C = mss.constraints()[k];
+        auto [c1,c2] = C.connectors;
+
+        Vec<D> p1, p2;
+        if (c1.type == Connector::FIX)
+          p1 = mss.fixes()[c1.nr].pos;
+        else
+          p1 = xmat.row(c1.nr);
+        if (c2.type == Connector::FIX)
+          p2 = mss.fixes()[c2.nr].pos;
+        else
+          p2 = xmat.row(c2.nr);
+
+        double dist = norm(p1-p2);
+        Vec<D> dC1 = 1.0/norm(p1-p2) * (p2-p1);
+        Vec<D> dC2 = -dC1;
+
+        double lam = lambda(k);
+
+        if (c1.type == Connector::MASS)
+          fmat.row(c1.nr) += lam * dC1;
+        if (c2.type == Connector::MASS)
+          fmat.row(c2.nr) += lam * dC2;
+      }
+
+    // constraint equations C(x)=0
+    for (size_t k = 0; k < nc; k++)
+      {
+        auto & C = mss.constraints()[k];
+        auto [c1,c2] = C.connectors;
+
+        Vec<D> p1, p2;
+        if (c1.type == Connector::FIX)
+          p1 = mss.fixes()[c1.nr].pos;
+        else
+          p1 = xmat.row(c1.nr);
+        if (c2.type == Connector::FIX)
+          p2 = mss.fixes()[c2.nr].pos;
+        else
+          p2 = xmat.row(c2.nr);
+
+        f(nm*D + k) = norm(p1-p2) - C.length;
+      }
+    // // divide by mass
+    // for (size_t i = 0; i < mss.masses().size(); i++)
+    //   fmat.row(i) *= 1.0/mss.masses()[i].mass;
   }
   
   virtual void evaluateDeriv (VectorView<double> x, MatrixView<double> df) const override
@@ -239,6 +321,49 @@ public:
       }
   }
   
+};
+
+template <int D>
+class ConstrainedMassMatrixFunction : public NonlinearFunction
+{
+  MassSpringSystem<D> & mss;
+public:
+  ConstrainedMassMatrixFunction(MassSpringSystem<D> & _mss) : mss(_mss) {}
+
+  virtual size_t dimX() const override {
+    return D * mss.masses().size() + mss.constraints().size();
+  }
+
+  virtual size_t dimF() const override {
+    return D * mss.masses().size() + mss.constraints().size();
+  }
+
+  virtual void evaluate(VectorView<double> x, VectorView<double> f) const override {
+    size_t nm = mss.masses().size();
+    size_t nc = mss.constraints().size();
+
+    // Mass part
+    for (size_t i = 0; i < nm; i++)
+      for (size_t d = 0; d < D; d++)
+        f(D * i + d) = mss.masses()[i].mass * x(D * i + d);
+
+    // Constraint part
+    for (size_t k = 0; k < nc; k++)
+      f(nm * D + k) = 0.0;
+  }
+
+  virtual void evaluateDeriv(VectorView<double> x, MatrixView<double> df) const override {
+    size_t nm = mss.masses().size();
+    size_t nc = mss.constraints().size();
+    size_t N = D * nm + nc;
+
+    df = 0.0;
+    // Diagonal for mass part
+    for (size_t i = 0; i < nm; i++)
+      for (size_t d = 0; d < D; d++)
+        df(D * i + d, D * i + d) = mss.masses()[i].mass;
+    // Constraints part remains zero
+  }
 };
 
 #endif

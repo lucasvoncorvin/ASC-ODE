@@ -12,6 +12,8 @@ PYBIND11_MAKE_OPAQUE(std::vector<Mass<3>>);
 PYBIND11_MAKE_OPAQUE(std::vector<Fix<3>>);
 PYBIND11_MAKE_OPAQUE(std::vector<Spring>);
 PYBIND11_MAKE_OPAQUE(std::vector<Chain>);
+PYBIND11_MAKE_OPAQUE(std::vector<DistanceConstraint>);
+
 
 PYBIND11_MODULE(mass_spring, m) {
     m.doc() = "mass-spring-system simulator"; 
@@ -80,11 +82,17 @@ PYBIND11_MODULE(mass_spring, m) {
                              [](Chain & c) { return c.connectors; })
       ;
 
-    
+    py::class_<DistanceConstraint>(m, "DistanceConstraint")
+      .def(py::init<double,std::array<Connector,2>>())
+      .def_property_readonly("connectors",
+                             [](DistanceConstraint & c) { return c.connectors; })
+      ;
+
     py::bind_vector<std::vector<Mass<3>>>(m, "Masses3d");
     py::bind_vector<std::vector<Fix<3>>>(m, "Fixes3d");
     py::bind_vector<std::vector<Spring>>(m, "Springs");    
-    py::bind_vector<std::vector<Chain>>(m, "Chains");    
+    py::bind_vector<std::vector<Chain>>(m, "Chains"); 
+    py::bind_vector<std::vector<DistanceConstraint>>(m, "DistanceConstraints"); 
     
     
     py::class_<MassSpringSystem<2>> (m, "MassSpringSystem2d")
@@ -106,53 +114,75 @@ PYBIND11_MODULE(mass_spring, m) {
       .def("add", [](MassSpringSystem<3> & mss, Fix<3> f) { return mss.addFix(f); })
       .def("add", [](MassSpringSystem<3> & mss, Spring s) { return mss.addSpring(s); })
       .def("add", [](MassSpringSystem<3> & mss, Chain c) { return mss.addChain(c); })
+      .def("add", [](MassSpringSystem<3> & mss, DistanceConstraint c) { return mss.addConstraint(c); })
       .def_property_readonly("masses", [](MassSpringSystem<3> & mss) -> auto& { return mss.masses(); })
       .def_property_readonly("fixes", [](MassSpringSystem<3> & mss) -> auto& { return mss.fixes(); })
       .def_property_readonly("springs", [](MassSpringSystem<3> & mss) -> auto& { return mss.springs(); })
       .def_property_readonly("chains", [](MassSpringSystem<3> & mss) -> auto& { return mss.chains(); })
+      .def_property_readonly("constraints", [](MassSpringSystem<3> & mss) -> auto& { return mss.constraints(); })
+      // .def("addConstraint", &MassSpringSystem<3>::addConstraint)
+
       .def("__getitem__", [](MassSpringSystem<3> mss, Connector & c) {
         if (c.type==Connector::FIX) return py::cast(mss.fixes()[c.nr]);
         else return py::cast(mss.masses()[c.nr]);
       })
       
       .def("getState", [] (MassSpringSystem<3> & mss) {
-        Vector<> x(3*mss.masses().size());
-        Vector<> dx(3*mss.masses().size());
-        Vector<> ddx(3*mss.masses().size());
+        Vector<> x(3*mss.masses().size() + mss.constraints().size());
+        Vector<> dx(3*mss.masses().size() + mss.constraints().size());
+        Vector<> ddx(3*mss.masses().size() + mss.constraints().size());
         mss.getState (x, dx, ddx);
         return std::vector<double>(x);
       })
 
       .def("setState", [](MassSpringSystem<3> &mss,
-                    std::vector<std::array<double,3>> values,
-                    std::vector<std::array<double,3>> dvalues,
-                    std::vector<std::array<double,3>> ddvalues) {
-        Vector<> x(3*mss.masses().size());
-        Vector<> dx(3*mss.masses().size());
-        Vector<> ddx(3*mss.masses().size());
-        for (size_t i = 0; i < values.size(); ++i) {
-            for (int j = 0; j < 3; ++j) {
-                x[3*i+j] = values[i][j];
-                dx[3*i+j] = dvalues[i][j];
-                ddx[3*i+j] = ddvalues[i][j];
-            }
-        }
-        mss.setState(x, dx, ddx);
+                          std::vector<std::array<double,3>> values,
+                          std::vector<std::array<double,3>> dvalues,
+                          std::vector<std::array<double,3>> ddvalues) {
+
+          size_t nm = mss.masses().size();
+          size_t nc = mss.constraints().size();
+
+          Vector<> x(3*nm + nc);
+          Vector<> dx(3*nm + nc);
+          Vector<> ddx(3*nm + nc);
+
+          for (size_t i = 0; i < values.size(); ++i) {
+              for (int j = 0; j < 3; ++j) {
+                  x[3*i+j]  = values[i][j];
+                  dx[3*i+j] = dvalues[i][j];
+                  ddx[3*i+j] = ddvalues[i][j];
+              }
+          }
+
+          mss.setState(x.range(0, 3*nm), dx.range(0, 3*nm), ddx.range(0, 3*nm));
       })
 
+
       .def("simulate", [](MassSpringSystem<3> & mss, double tend, size_t steps) {
-        Vector<> x(3*mss.masses().size());
-        Vector<> dx(3*mss.masses().size());
-        Vector<> ddx(3*mss.masses().size());
-        mss.getState (x, dx, ddx);
+        size_t nm = mss.masses().size();
+        size_t nc = mss.constraints().size();
+        
+        Vector<> x(3*nm + nc);
+        Vector<> dx(3*nm + nc);
+        Vector<> ddx(3*nm + nc);
+        
+        // Get initial state (positions only)
+        mss.getState (x.range(0, 3*nm), dx.range(0, 3*nm), ddx.range(0, 3*nm));
+        
+        // Initialize Lagrange multipliers to 0
+        x.range(3*nm, 3*nm + nc) = 0.0;
+        dx.range(3*nm, 3*nm + nc) = 0.0;
+        ddx.range(3*nm, 3*nm + nc) = 0.0;
 
         auto mss_func = std::make_shared<MSS_Function<3>> (mss);
-        auto mass = std::make_shared<IdentityFunction> (x.size());
+        auto mass = std::make_shared<ConstrainedMassMatrixFunction<3>>(mss);
 
         SolveODE_Alpha(tend, steps, 0.8, x, dx, ddx, mss_func, mass);
 
-        mss.setState (x, dx, ddx);  
-    });
+        // Set final state (positions only)
+        mss.setState (x.range(0, 3*nm), dx.range(0, 3*nm), ddx.range(0, 3*nm));  
+      });
 
 
   
