@@ -13,6 +13,7 @@ chapters:
       - file: example_electric_network.md
       - file: example_runge_kutta.md
       - file: example_autodiff.md
+      - file: example_mechsystems.md
   - file: other_stuff.md
 
 
