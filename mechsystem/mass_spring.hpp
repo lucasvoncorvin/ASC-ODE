@@ -306,20 +306,172 @@ public:
   
   virtual void evaluateDeriv (VectorView<double> x, MatrixView<double> df) const override
   {
-    // TODO: exact differentiation
-    double eps = 1e-8;
-    Vector<> xl(dimX()), xr(dimX()), fl(dimF()), fr(dimF());
-    for (size_t i = 0; i < dimX(); i++)
-      {
-        xl = x;
-        xl(i) -= eps;
-        xr = x;
-        xr(i) += eps;
-        evaluate (xl, fl);
-        evaluate (xr, fr);
-        df.col(i) = 1/(2*eps) * (fr-fl);
-      }
-  }
+    df = 0.0;
+
+    size_t nm = mss.masses().size();
+    size_t nc = mss.constraints().size();
+
+    auto xmat = x.range(0, nm * D).asMatrix(nm, D);
+    auto lambda = x.range(nm * D, nm * D + nc);
+
+    // ----------------------------------------------------------------------
+    // 1. SPRING JACOBIAN  (exact tangent stiffness)
+    // ----------------------------------------------------------------------
+    for (auto &spring : mss.springs())
+    {
+        auto [c1, c2] = spring.connectors;
+
+        Vec<D> p1 = (c1.type == Connector::FIX)
+                      ? mss.fixes()[c1.nr].pos
+                      : xmat.row(c1.nr);
+        Vec<D> p2 = (c2.type == Connector::FIX)
+                      ? mss.fixes()[c2.nr].pos
+                      : xmat.row(c2.nr);
+
+        Vec<D> d  = p2 - p1;
+        double L  = norm(d);
+        if (L < 1e-12) continue;
+
+        Vec<D> n = d / L;
+
+        double k  = spring.stiffness;
+        double L0 = spring.length;
+
+        // K = k*n*n^T + (k*(L-L0)/L) * (I - n*n^T)
+        Mat<D,D> K;
+        double force_over_L = k * (L - L0) / L;
+
+        for (size_t i=0;i<D;i++)
+            for (size_t j=0;j<D;j++)
+            {
+                double ninj = n(i)*n(j);
+                K(i,j) = k*ninj + force_over_L*((i==j?1.0:0.0) - ninj);
+            }
+
+        // Insert into global Jacobian: df = dF/dx
+        auto addBlock = [&](size_t r, size_t c, double val)
+        {
+            df(r, c) += val;
+        };
+
+        if (c1.type == Connector::MASS)
+        {
+            for (size_t i=0;i<D;i++)
+                for (size_t j=0;j<D;j++)
+                    addBlock(c1.nr*D + i, c1.nr*D + j, -K(i,j));   // df1/dp1
+        }
+
+        if (c2.type == Connector::MASS)
+        {
+            for (size_t i=0;i<D;i++)
+                for (size_t j=0;j<D;j++)
+                    addBlock(c2.nr*D + i, c2.nr*D + j, -K(i,j));   // df2/dp2
+        }
+
+        if (c1.type == Connector::MASS && c2.type == Connector::MASS)
+        {
+            for (size_t i=0;i<D;i++)
+                for (size_t j=0;j<D;j++)
+                {
+                    addBlock(c1.nr*D + i, c2.nr*D + j,  K(i,j));   // df1/dp2
+                    addBlock(c2.nr*D + i, c1.nr*D + j,  K(i,j));   // df2/dp1
+                }
+        }
+    }
+
+    // ----------------------------------------------------------------------
+    // 2. DISTANCE CONSTRAINT JACOBIAN (exact)
+    // ----------------------------------------------------------------------
+    for (size_t k = 0; k < nc; k++)
+    {
+        auto & Ck = mss.constraints()[k];
+        auto [c1, c2] = Ck.connectors;
+
+        Vec<D> p1 = (c1.type == Connector::FIX)
+                      ? mss.fixes()[c1.nr].pos
+                      : xmat.row(c1.nr);
+        Vec<D> p2 = (c2.type == Connector::FIX)
+                      ? mss.fixes()[c2.nr].pos
+                      : xmat.row(c2.nr);
+
+        Vec<D> d = p2 - p1;
+        double L = norm(d);
+        if (L < 1e-12) continue;
+
+        Vec<D> n = d / L;                   // unit direction
+        double lam = lambda(k);             // multiplier
+
+        // Matrix M = (I - n·n^T)/L
+        Mat<D,D> M;
+        for (size_t i=0;i<D;i++)
+            for (size_t j=0;j<D;j++)
+                M(i,j) = ((i==j)?1.0:0.0) - n(i)*n(j);
+        M *= (1.0 / L);
+
+        auto addBlock = [&](size_t r, size_t c, double val)
+        {
+            df(r, c) += val;
+        };
+
+        // ----------------------------------------------------------
+        // 2A. dF/dλ: add n and -n into force rows
+        // ----------------------------------------------------------
+        if (c1.type == Connector::MASS)
+            for (size_t i=0;i<D;i++)
+                addBlock(c1.nr*D + i, nm*D + k,  n(i));
+
+        if (c2.type == Connector::MASS)
+            for (size_t i=0;i<D;i++)
+                addBlock(c2.nr*D + i, nm*D + k, -n(i));
+
+        // ----------------------------------------------------------
+        // 2B. dF/dx: tangent stiffness from λ * n
+        // ----------------------------------------------------------
+        // force on p1: f1 =  λ*n
+        // df1/dp1 = -λ M
+        // df1/dp2 = +λ M
+
+        if (c1.type == Connector::MASS)
+        {
+            for (size_t i=0;i<D;i++)
+                for (size_t j=0;j<D;j++)
+                    addBlock(c1.nr*D + i, c1.nr*D + j, -lam * M(i,j)); // df1/dp1
+
+            if (c2.type == Connector::MASS)
+                for (size_t i=0;i<D;i++)
+                    for (size_t j=0;j<D;j++)
+                        addBlock(c1.nr*D + i, c2.nr*D + j, +lam * M(i,j)); // df1/dp2
+        }
+
+        // force on p2: f2 = -λ*n
+        // df2/dp2 = -λ M
+        // df2/dp1 = +λ M
+        if (c2.type == Connector::MASS)
+        {
+            if (c1.type == Connector::MASS)
+                for (size_t i=0;i<D;i++)
+                    for (size_t j=0;j<D;j++)
+                        addBlock(c2.nr*D + i, c1.nr*D + j, +lam * M(i,j)); // df2/dp1
+
+            for (size_t i=0;i<D;i++)
+                for (size_t j=0;j<D;j++)
+                    addBlock(c2.nr*D + i, c2.nr*D + j, -lam * M(i,j)); // df2/dp2
+        }
+
+        // ----------------------------------------------------------
+        // 2C. dC/dx: bottom constraint row
+        // ----------------------------------------------------------
+        if (c1.type == Connector::MASS)
+            for (size_t j=0;j<D;j++)
+                addBlock(nm*D + k, c1.nr*D + j,  n(j));   // dC/dp1
+
+        if (c2.type == Connector::MASS)
+            for (size_t j=0;j<D;j++)
+                addBlock(nm*D + k, c2.nr*D + j, -n(j));   // dC/dp2
+
+        // bottom-right block dC/dλ = 0 (already zero)
+    }
+}
   
 };
 
