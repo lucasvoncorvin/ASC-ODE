@@ -90,10 +90,10 @@ Here we should write how to install everything needed to run the models!
 
 For $N$ masses and $C$ constraints the sizes are:
 
-- positions: $dN$  
-- velocities: $dN$  
-- accelerations: $dN$  
-- multipliers: $C$
+- positions: $3Nx3N$  
+- velocities: $3Nx3N$  
+- accelerations: $3Nx3N$  
+- multipliers: $CxC$
 
 Thus the state stored in the solver is:
 x[0 : dN] → mass positions
