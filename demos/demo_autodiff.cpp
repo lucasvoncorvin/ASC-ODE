@@ -49,18 +49,18 @@ int main()
   //Test for the pendulum
   PendulumAD pendulum(1.0); //Our pendulum via our class PendulumAD
 
-  std::vector<double> x={M_PI/4, 0.1}; //Our test (x,x') (ie. (pi/4) rad with angular speed 0.1)
-    std::vector<double> f(2); //Where we are going to store our evaluation
-    std::vector<std::vector<double>> df(2, std::vector<double>(2)); //for storing the Jacobian Matrix
+  Vector<> x_state = {M_PI/4, 0.1}; //Our test (x,x') (ie. (pi/4) rad with angular speed 0.1)
+  Vector<> f(2); //Where we are going to store our evaluation
+  Matrix<> df(2, 2); //for storing the Jacobian Matrix
   
-    pendulum.evaluate(x, f); //testing the evaluation of our defined f for the ODE system
-    std::cout << "x = [" << x[0] << ", " << x[1] << "]\n";
-    std::cout << "f(x) = [" << f[0] << ", " << f[1] << "]\n";
-    
-    pendulum.evaluateDeriv(x, df); //Jacobian tsting
-    std::cout << "\nJacobian f'(x):\n";
-    std::cout << "[" << df[0][0] << ", " << df[0][1] << "]\n";
-    std::cout << "[" << df[1][0] << ", " << df[1][1] << "]\n";
+  pendulum.evaluate(x_state, f); //testing the evaluation of our defined f for the ODE system
+  std::cout << "x = [" << x_state(0) << ", " << x_state(1) << "]\n";
+  std::cout << "f(x) = [" << f(0) << ", " << f(1) << "]\n";
+  
+  pendulum.evaluateDeriv(x_state, df); //Jacobian tsting
+  std::cout << "\nJacobian f'(x):\n";
+  std::cout << "[" << df(0,0) << ", " << df(0,1) << "]\n";
+  std::cout << "[" << df(1,0) << ", " << df(1,1) << "]\n";
   
   
     return 0;
