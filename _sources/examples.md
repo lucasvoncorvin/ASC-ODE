@@ -10,4 +10,6 @@ The source code for all the examples can be found in the demos folder of the rep
 - [Mass-Spring System](example_mass_spring.md)
 - [Electric Network](example_electric_network.md)
 - [Runge-Kutta](example_runge_kutta.md)
+- [Autodiff](example_autodiff.md)
+- [Mechanical System](example_mechsystems.md)
 
