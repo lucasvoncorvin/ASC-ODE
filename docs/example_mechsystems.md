@@ -184,64 +184,117 @@ $$
 
 ### 4.1.1 Jacobian of Springs
 
-Each spring contributes a nonlinear force
+Each spring connecting positions $p_1$ and $p_2$ contributes a nonlinear force
 
 $$
 f = k (L - L_0) n,
 \qquad
-n = \frac{p_2 - p_1}{\|p_2 - p_1\|}.
+n = \frac{p_2 - p_1}{\|p_2 - p_1\|},
+\qquad
+L = \|p_2 - p_1\|,
 $$
+
+where $k$ is the stiffness and $L_0$ is the rest length.
 
 The exact tangent stiffness matrix is:
 
 $$
-K = k n n^\top
+K = k \, n n^\top
   + \frac{k(L-L_0)}{L} \big( I - n n^\top \big),
 $$
 
-which enters the Jacobian block:
+which can be decomposed into:
+- **Material stiffness**: $k \, n n^\top$ (depends on stiffness)
+- **Geometric stiffness**: $\frac{k(L-L_0)}{L} \big( I - n n^\top \big)$ (depends on current force)
 
-- $+\;K$ on the diagonal of each connected mass  
-- $-\;K$ on the off-diagonal blocks  
+For a spring between masses $i$ and $j$, the force on mass $i$ is $f_i = +k(L-L_0)n$ and on mass $j$ is $f_j = -k(L-L_0)n$.
 
-Spring Jacobians give geometric + material stiffness.
+The force derivatives are:
+
+$$
+\frac{\partial f_i}{\partial p_i} = -K,
+\qquad
+\frac{\partial f_i}{\partial p_j} = +K,
+$$
+$$
+\frac{\partial f_j}{\partial p_i} = +K,
+\qquad
+\frac{\partial f_j}{\partial p_j} = -K,
+$$
+
+which enter the global Jacobian as:
+
+- **Diagonal blocks** (e.g., $\frac{\partial f_i}{\partial p_i}$): $-K$
+- **Off-diagonal blocks** (e.g., $\frac{\partial f_i}{\partial p_j}$): $+K$
+
+Spring Jacobians give both geometric and material stiffness.
 
 ---
 
 ### 4.1.2 Jacobian of Constraints
 
-A distance constraint has:
+A distance constraint enforces:
 
 $$
-C = \|p_2 - p_1\| - L_0,
+C = \|p_2 - p_1\| - L_0 = 0,
+$$
+
+where $L_0$ is the fixed constraint length.
+
+Define the unit direction vector:
+
+$$
+n = \frac{p_2 - p_1}{L},
 \qquad
-n = \frac{p_2 - p_1}{L}.
+L = \|p_2 - p_1\|.
 $$
 
-Its gradient is:
+The constraint gradient is:
 
 $$
-\frac{\partial C}{\partial p_1} = n,
+\frac{\partial C}{\partial p_1} = -n,
 \qquad
-\frac{\partial C}{\partial p_2} = -n.
+\frac{\partial C}{\partial p_2} = +n.
 $$
 
-Constraint forces are:
+Constraint forces are applied via Lagrange multipliers. In the code, the gradient is stored as `dC1 = (p2-p1)/L = n`, which represents the direction from $p_1$ to $p_2$. The forces applied are:
 
 $$
-f_1 = \lambda n,
+f_1 = \lambda \cdot n \quad \text{(code: } \texttt{lam * dC1}\text{)},
+$$
+$$
+f_2 = -\lambda \cdot n \quad \text{(code: } \texttt{lam * dC2}\text{)}.
+$$
+
+The derivative of the unit direction with respect to position changes is:
+
+$$
+\frac{\partial n}{\partial (p_2 - p_1)}
+= \frac{1}{L}\big(I - nn^\top\big) \equiv M.
+$$
+
+Therefore:
+
+$$
+\frac{\partial n}{\partial p_1} = -M,
 \qquad
-f_2 = -\lambda n.
+\frac{\partial n}{\partial p_2} = +M.
 $$
 
-The derivative of the unit direction is:
+The Jacobian block for constraint forces is:
 
 $$
-\frac{\partial n}{\partial p}
-= \frac{1}{L}\big(I - nn^\top\big).
+\frac{\partial f_1}{\partial p_1} = -\lambda M,
+\qquad
+\frac{\partial f_1}{\partial p_2} = +\lambda M,
+$$
+$$
+\frac{\partial f_2}{\partial p_1} = +\lambda M,
+\qquad
+\frac{\partial f_2}{\partial p_2} = -\lambda M.
 $$
 
-So the Jacobian block for constraint forces is:
+In matrix form:
 
 $$
 \frac{\partial F_{\text{constraint}}}{\partial x}
@@ -254,49 +307,87 @@ $$
 M = \frac{1}{L}(I - n n^\top).
 $$
 
-Derivative w.r.t. $\lambda$:
+The derivative of constraint forces w.r.t. the multiplier $\lambda$:
+
+$$
+\frac{\partial f_1}{\partial \lambda} = +n,
+\qquad
+\frac{\partial f_2}{\partial \lambda} = -n.
+$$
+
+In vector form:
 
 $$
 \frac{\partial F}{\partial \lambda}
 =
 \begin{pmatrix}
-n \\ -n
++n \\ -n
 \end{pmatrix}.
 $$
 
-Bottom row:
+The constraint equation derivatives (bottom row of Jacobian):
 
 $$
-\frac{\partial C}{\partial x}
-=
-[n \;\; -n],
+\frac{\partial C}{\partial p_1} = -n,
+\qquad
+\frac{\partial C}{\partial p_2} = +n,
 \qquad
 \frac{\partial C}{\partial \lambda} = 0.
 $$
 
-### 4.1.3 Full Constraint Jacobian
+In row vector form:
 
-Combining:
+$$
+\frac{\partial C}{\partial x}
+=
+[-n^\top \;\; +n^\top],
+\qquad
+\frac{\partial C}{\partial \lambda} = 0.
+$$
 
-- the force derivatives w.r.t. $x$
-- force derivatives w.r.t. $\lambda$
-- constraint derivatives w.r.t. $x$
-- and the zero block for $\partial C / \partial \lambda$
+### 4.1.3 Full Constraint Jacobian Structure
 
-we obtain the exact Newton Jacobian:
+For a system with $N$ masses (dimension $dN$) and $C$ constraints, the Jacobian is a $(dN+C) \times (dN+C)$ matrix.
+
+For a single constraint $k$ between masses $i$ and $j$, combining all derivatives:
 
 $$
 J =
 \begin{pmatrix}
--\lambda M & +\lambda M & n \\
-+\lambda M & -\lambda M & -n \\
-n^\top     & -n^\top     & 0
+\frac{\partial F_{\text{forces}}}{\partial x} & \frac{\partial F_{\text{forces}}}{\partial \lambda} \\
+\frac{\partial C}{\partial x} & 0
 \end{pmatrix}.
 $$
 
-This is the complete analytic Jacobian for one distance constraint.
+For the specific case of **one constraint between two masses** (mass 1 and mass 2), the structure is:
 
-In a multi-mass system, these blocks are placed into the appropriate rows/columns corresponding to the constrained masses.
+$$
+J =
+\begin{pmatrix}
+-\lambda M & +\lambda M & +n \\
++\lambda M & -\lambda M & -n \\
+-n^\top     & +n^\top     & 0
+\end{pmatrix},
+$$
+
+where:
+- **Top-left block** ($2d \times 2d$): Force derivatives w.r.t. positions
+  - Block $(1,1)$: $-\lambda M$ (force on mass 1 w.r.t. position 1)
+  - Block $(1,2)$: $+\lambda M$ (force on mass 1 w.r.t. position 2)
+  - Block $(2,1)$: $+\lambda M$ (force on mass 2 w.r.t. position 1)
+  - Block $(2,2)$: $-\lambda M$ (force on mass 2 w.r.t. position 2)
+
+- **Top-right block** ($2d \times 1$): Force derivatives w.r.t. multiplier
+  - Row 1: $+n$ ($\partial f_1/\partial \lambda$)
+  - Row 2: $-n$ ($\partial f_2/\partial \lambda$)
+
+- **Bottom-left block** ($1 \times 2d$): Constraint derivatives w.r.t. positions
+  - Column 1: $-n^\top$ ($\partial C/\partial p_1$)
+  - Column 2: $+n^\top$ ($\partial C/\partial p_2$)
+
+- **Bottom-right block** ($1 \times 1$): Zero ($\partial C/\partial \lambda = 0$)
+
+In a multi-mass system with many constraints, these blocks are assembled into the appropriate rows and columns corresponding to each constrained mass pair and each constraint equation.
 
 ---
 
