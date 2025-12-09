@@ -1,4 +1,4 @@
-# Mass–Spring Systems as ODEs and DAEs
+# Mechanical Systems
 
 Up to now we solved ODE systems of the form
 
@@ -10,7 +10,7 @@ $$
 
 But as soon as we want to simulate many masses, springs, anchors, and constraints, the system becomes much larger.
 
-This section explains **how we extended the toolbox** to handle full mass–spring networks in 2D and 3D, including optional constraints.
+This section explains to handle full mass–spring networks in 2D and 3D, including optional constraints.
 
 ---
 
@@ -19,10 +19,10 @@ This section explains **how we extended the toolbox** to handle full mass–spri
 In a general structure (hanging chain, bridge, pendulum with a rigid bar, etc.), we have:
 
 - multiple masses with positions $x_i(t)$  
-- fixes (immovable anchor points)  
+- fixed points
 - springs connecting pairs of nodes  
-- optional fixed-length **distance constraints**  
-- a global gravity vector
+- optional fixed length distance constraints
+- a gravity vector
 
 All of these are stored inside:
 
@@ -69,9 +69,24 @@ $$
 X = (x, \lambda),
 $$
 
-where $\lambda$ are constraint multipliers.
+where $\lambda$ are constraint multipliers. 
 
-This turns the dynamics into a **Differential–Algebraic Equation (DAE)**.
+The force vector $\vec{f}$ induced by a constraint $g(x)$ is given by:
+$$
+\vec{f} = \lambda \nabla g(x)
+$$
+where $\lambda$ is the Lagrange multiplier and $\nabla g(x)$ is the gradient of the constraint with respect to the positions.
+
+The system of equations becomes:
+$$
+\begin{aligned}
+F &= \nabla_x L(x, \lambda) \\
+0 &= \nabla_\lambda L(x, \lambda)
+\end{aligned}
+$$
+where $L(x, \lambda)$ is the Lagrangian including constraints.
+
+This formulation ensures that the constraint is satisfied at all times, and the corresponding force is automatically computed.
 
 The right-hand side is implemented in:
 
@@ -81,31 +96,9 @@ which evaluates all forces, constraints, and Jacobians.
 
 ---
 
-# 3. Implementation + Installation
+# 3. Time Integration: The Generalized α-Method
 
-Here we should write how to install everything needed to run the models!
-
-
-# 3. The Extended State Vector
-
-For $N$ masses and $C$ constraints the sizes are:
-
-- positions: $3Nx3N$  
-- velocities: $3Nx3N$  
-- accelerations: $3Nx3N$  
-- multipliers: $CxC$
-
-Thus the state stored in the solver is:
-x[0 : dN] → mass positions
-x[dN : dN + C] → constraint multipliers λ
-
-`getState` and `setState` convert this automatically.
-
----
-
-# 4. Time Integration: The Generalized α-Method
-
-This chapter should be used to explain the numerical method as well as the exact calculated derivative we used.
+In this chapter we introduce the numerical method used to solve the system of equations.
 
 Large spring networks are stiff → explicit methods blow up.  
 
@@ -144,7 +137,7 @@ Everything else happens inside the C++ backend.
 
 ## 4.1 The Jacobian and Why We Need It
 
-Because our system contains nonlinear springs and holonomic constraints enforced 
+Because our system contains nonlinear springs and constraints enforced 
 by Lagrange multipliers, the right-hand side
 
 $$
@@ -170,7 +163,7 @@ $$
 J = \frac{\partial F}{\partial (x,\lambda)}.
 $$
 
-Thus we must provide the full Jacobian of the DAE system:
+Thus we must provide the full Jacobian of the system:
 
 $$
 J =
@@ -370,28 +363,6 @@ J =
 \end{pmatrix},
 $$
 
-where:
-- **Top-left block** ($2d \times 2d$): Force derivatives w.r.t. positions
-  - Block $(1,1)$: $-\lambda M$ (force on mass 1 w.r.t. position 1)
-  - Block $(1,2)$: $+\lambda M$ (force on mass 1 w.r.t. position 2)
-  - Block $(2,1)$: $+\lambda M$ (force on mass 2 w.r.t. position 1)
-  - Block $(2,2)$: $-\lambda M$ (force on mass 2 w.r.t. position 2)
-
-- **Top-right block** ($2d \times 1$): Force derivatives w.r.t. multiplier
-  - Row 1: $+n$ ($\partial f_1/\partial \lambda$)
-  - Row 2: $-n$ ($\partial f_2/\partial \lambda$)
-
-- **Bottom-left block** ($1 \times 2d$): Constraint derivatives w.r.t. positions
-  - Column 1: $-n^\top$ ($\partial C/\partial p_1$)
-  - Column 2: $+n^\top$ ($\partial C/\partial p_2$)
-
-- **Bottom-right block** ($1 \times 1$): Zero ($\partial C/\partial \lambda = 0$)
-
-In a multi-mass system with many constraints, these blocks are assembled into the appropriate rows and columns corresponding to each constrained mass pair and each constraint equation.
-
----
-
-### 4.1.4 Where the Jacobian Is Implemented in the Code
 
 The Jacobian is implemented inside the method:
 
@@ -442,11 +413,9 @@ for i, m in enumerate(mss.masses):
     sphere_list[i].position = m.pos
 ```
 
-This allowed us to build hanging chains, constrained pendulums, a little “bridge”, and a spinning spring–kreisel model.
-
 
 # 5.3 Summary of Implementation with Python
-Summary of This Extension
+
 In this extension of the project we:
 - generalized the mass–spring model to many nodes,
 - added fixes, chains, and constraints,
@@ -465,7 +434,26 @@ User guideline
 
 # 6. Examples
 Below is a summary of the Jupyter notebooks included with the project.
-## 6.1 Mass Spring Chain
+
+## 6.1 Double Pendulum
+`mass_spring_constraint.ipynb` – Rigid Rod / Pendulum Using Constraints
+This example introduces distance constraints, which enforce a fixed length between two nodes using Lagrange multipliers. We introduce this because modeling the problem with its angle becomes quite difficult for complex systems.
+The constraints thereby enforces the system, s.t. The mass always stays exactly at distance l from the anchor point x_0. So it always lies on a circle with radius l, which is the rod length.
+
+
+Core example
+A rigid pendulum:
+```py
+fix = mss.add(ms.Fix([0,0,0]))
+m   = mss.add(ms.Mass(1.0, [1,0,0]))
+
+# keep them exactly 1 unit apart
+mss.add(ms.DistanceConstraint(1.0, [fix, m]))
+
+mss.simulate(5.0, 600)
+```
+
+## 6.2 Hanging Chain
 `mass_spring_chain.ipynb` – Hanging Chain
 This is the “intro example” notebook.
 It shows the simplest nontrivial use case: a chain of masses connected by springs, hanging under gravity.
@@ -478,16 +466,20 @@ What it demonstrates:
 Core idea:
 We build something like:
 
+
+```
 Fix
- |
+ │
 Spring
- |
-Mass1
- |
+ │
+Mass 1
+ │
 Spring
-|
-Mass2
- ...
+ │
+Mass 2
+ │
+⋮
+```
 
 
 Key code pattern
@@ -506,9 +498,8 @@ for i in range(10):
 mss.simulate(5.0, 800)
 ```
 
-You see the chain sag and oscillate — a sort of sanity check that the system behaves as a physical rope.
 
-## 6.1 Mass Spring Bridge
+## 6.3 Mass Spring Bridge
 `mass_spring_bridge.ipynb` – A Little Cable Bridge / Lattice
 
 Instead of a simple chain, we build a 2D grid of masses connected by springs, so the structure behaves like a flexible mini-bridge.
@@ -519,83 +510,19 @@ What it demonstrates:
 - Fixing anchor nodes at both ends
 - Dynamic deformation under gravity
 
-Structure
-
-We create a W×H lattice:
-●───●───●───●   ← fixed on left + right
-│  /│  /│  /
-●───●───●───●
+A periodic force is applied on all nodes in z direction to simulate dynamic loads.
 
 
-Key code pattern
-```py
-W, H = 6, 2
-nodes = []
 
-for j in range(H):
-    row = []
-    for i in range(W):
-        m = mss.add(ms.Mass(0.2, [i, -j, 0]))
-        row.append(m)
-    nodes.append(row)
-
-# fix the left and right ends
-mss.add(ms.Fix([0,0,0]))
-mss.add(ms.Fix([W-1,0,0]))
-
-# connect horizontal, vertical, and diagonal springs
-
-```
-
-When simulated, the bridge bends and vibrates realistically — and this already shows why stable implicit integration is essential.
-
-## 6.3 Mass Spring Constraint
-`mass_spring_constraint.ipynb` – Rigid Rod / Pendulum Using Constraints
-This example introduces distance constraints, which enforce a fixed length between two nodes using Lagrange multipliers. We introduce this because modeling the problem with its angle becomes quite difficult for complex systems.
-The constraints thereby enforces the system, s.t. The mass always stays exactly at distance l from the anchor point x_0. So it always lies on a circle with radius l, which is the rod length.
-
-What it demonstrates:
-- Adding DistanceConstraint objects
-- Mixing springs and constraints
-- Understanding how constraints give rigid-body-like behavior
-
-
-Core example
-A rigid pendulum:
-```py
-fix = mss.add(ms.Fix([0,0,0]))
-m   = mss.add(ms.Mass(1.0, [1,0,0]))
-
-# keep them exactly 1 unit apart
-mss.add(ms.DistanceConstraint(1.0, [fix, m]))
-
-mss.simulate(5.0, 600)
-```
-
-
-The result is a clean swing, not a stretchy spring.
-This notebook demonstrates how constraints do not require any user-side derivative computations — the library handles the DAE system internally.
 
 ## 6.4 Mass Spring Kreisel
 `mass_spring_kreisel.ipynb` – Spinning Spring Kreisel
 This creates a kind of spinning top / rotor made of springs.
 As it rotates, the spring arrangement stabilizes due to centripetal forces.
 
-What it demonstrates:
-- Building circular spring structures
-- Understanding rotation stabilization
-- The effect of stiffness vs. rotation speed
-- How our solver handles stiff, fast-moving systems
+We arrange 3 masses on a circle and one fixed mass on the bottom and connect neighbors with springs.
 
-Geometry
-We arrange masses on a circle and connect neighbors with springs:
-    ●───●
-   /       \
-  ●         ●
-   \       /
-     ●───●
-
-Then spin the structure by assigning initial velocities.
+Then we spin the structure by assigning initial velocities corresponding to a circular motion.
 
 Key code snippet
 ```py
@@ -619,59 +546,15 @@ for i in range(N):
 # give initial spinning velocity
 
 ```
-The kreisel stabilizes, showing off the robustness of the α-method.
-
-## 6.5 Double Chain Pendulum
-`double_chain_pendulum.ipynb` – Two Pendulums Linked in a Chain
-This notebook combines everything:
-- multiple masses
-- constraints
-- springs
-- gravity
-- chaotic motion
-
-The system is a “double pendulum” but built using our API rather than closed-form equations.
-This makes the motion unpredictable and visually interesting.
-
-What it demonstrates:
-- Chaining constraints to make articulated structures
-- Nonlinear, chaotic dynamics
-- Importance of small time steps
-
-Core idea
-Fix  ●
-      \
-       (constraint)
-        \
-         ● Mass 1
-          \
-           (constraint)
-            \
-             ● Mass 2
-
-Key snippet
-```py
-f = mss.add(ms.Fix([0,0,0]))
-m1 = mss.add(ms.Mass(1.0, [1,0,0]))
-m2 = mss.add(ms.Mass(1.0, [2,0,0]))
-
-mss.add(ms.DistanceConstraint(1.0, [f, m1]))
-mss.add(ms.DistanceConstraint(1.0, [m1, m2]))
-
-mss.simulate(10.0, 2000)
-```
-
-The motion looks chaotic — just like a theoretical double pendulum should — but here it comes purely from the mass–spring–constraint model.
 
 # 7. Summary of Example Notebooks
 
-| Notebook                | Focus                                     |
+| Notebook                | Description                                |
 |-------------------------|--------------------------------------------|
 | `mass_spring_chain`     | Basic spring networks, ropes               |
 | `mass_spring_bridge`    | 2D lattices, structural stability          |
 | `mass_spring_constraint`| Lagrange constraints, rigid rods           |
 | `mass_spring_kreisel`   | Rotation, stiff dynamics                   |
-| `double_chain_pendulum` | Chains of constraints, chaotic motion      |
 
 
 
