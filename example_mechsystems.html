@@ -1,0 +1,1225 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Mass–Spring Systems as ODEs and DAEs &#8212; ASC-ODE</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'example_mechsystems';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Useful Classes" href="other_stuff.html" />
+    <link rel="prev" title="Autodiff" href="example_autodiff.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/ASC_Logo_transparent_300ppi_RGB.png" class="logo__image only-light" alt="ASC-ODE - Home"/>
+    <script>document.write(`<img src="_static/ASC_Logo_transparent_300ppi_RGB.png" class="logo__image only-dark" alt="ASC-ODE - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    Intro
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="solving_ODEs.html">Solving ODEs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="runge_kutta_timesteppers.html">General Runge Kutta</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="examples.html">Examples</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="example_mass_spring.html">Mass-Spring System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_electric_network.html">Electric Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_runge_kutta.html">Runge Kutta</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_autodiff.html">Autodiff</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Mass–Spring Systems as ODEs and DAEs</a></li>
+
+
+
+
+
+
+
+
+
+
+
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="other_stuff.html">Useful Classes</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/lucasvoncorvin/ASC-ODE" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/example_mechsystems.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Mass–Spring Systems as ODEs and DAEs</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Mass–Spring Systems as ODEs and DAEs</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#building-a-full-massspring-network">1. Building a Full Mass–Spring Network</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#how-forces-enter-the-ode">2. How Forces Enter the ODE</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spring-forces">2.1 Spring Forces</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#constraint-forces-via-lagrange-multipliers">2.2 Constraint Forces via Lagrange Multipliers</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation-installation">3. Implementation + Installation</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#the-extended-state-vector">3. The Extended State Vector</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#time-integration-the-generalized-method">4. Time Integration: The Generalized α-Method</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#properties">Properties:</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-jacobian-and-why-we-need-it">4.1 The Jacobian and Why We Need It</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#jacobian-of-springs">4.1.1 Jacobian of Springs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#jacobian-of-constraints">4.1.2 Jacobian of Constraints</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#full-constraint-jacobian-structure">4.1.3 Full Constraint Jacobian Structure</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#where-the-jacobian-is-implemented-in-the-code">4.1.4 Where the Jacobian Is Implemented in the Code</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#interaction-from-python">5.Interaction From Python</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#python-example">5.1 Python Example</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#visualization-in-jupyter">5.2 Visualization in Jupyter</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-implementation-with-python">5.3 Summary of Implementation with Python</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">6. Examples</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mass-spring-chain">6.1 Mass Spring Chain</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mass-spring-bridge">6.1 Mass Spring Bridge</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mass-spring-constraint">6.3 Mass Spring Constraint</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mass-spring-kreisel">6.4 Mass Spring Kreisel</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#double-chain-pendulum">6.5 Double Chain Pendulum</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-example-notebooks">7. Summary of Example Notebooks</a></li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="massspring-systems-as-odes-and-daes">
+<h1>Mass–Spring Systems as ODEs and DAEs<a class="headerlink" href="#massspring-systems-as-odes-and-daes" title="Link to this heading">#</a></h1>
+<p>Up to now we solved ODE systems of the form</p>
+<div class="math notranslate nohighlight">
+\[
+y' = f(y,t) = f(y),
+\]</div>
+<p>(for autonomous systems), coming from simple mass–spring models with one mass.</p>
+<p>But as soon as we want to simulate many masses, springs, anchors, and constraints, the system becomes much larger.</p>
+<p>This section explains <strong>how we extended the toolbox</strong> to handle full mass–spring networks in 2D and 3D, including optional constraints.</p>
+</section>
+<hr class="docutils" />
+<section class="tex2jax_ignore mathjax_ignore" id="building-a-full-massspring-network">
+<h1>1. Building a Full Mass–Spring Network<a class="headerlink" href="#building-a-full-massspring-network" title="Link to this heading">#</a></h1>
+<p>In a general structure (hanging chain, bridge, pendulum with a rigid bar, etc.), we have:</p>
+<ul class="simple">
+<li><p>multiple masses with positions <span class="math notranslate nohighlight">\(x_i(t)\)</span></p></li>
+<li><p>fixes (immovable anchor points)</p></li>
+<li><p>springs connecting pairs of nodes</p></li>
+<li><p>optional fixed-length <strong>distance constraints</strong></p></li>
+<li><p>a global gravity vector</p></li>
+</ul>
+<p>All of these are stored inside:</p>
+<p><code class="docutils literal notranslate"><span class="pre">MassSpringSystem&lt;dim&gt;</span></code></p>
+<p>where <code class="docutils literal notranslate"><span class="pre">dim</span></code> is either <code class="docutils literal notranslate"><span class="pre">2</span></code> or <code class="docutils literal notranslate"><span class="pre">3</span></code>.</p>
+<p>Each element (Mass, Fix, Spring, Constraint) is added using a corresponding <code class="docutils literal notranslate"><span class="pre">add(...)</span></code> method.</p>
+</section>
+<hr class="docutils" />
+<section class="tex2jax_ignore mathjax_ignore" id="how-forces-enter-the-ode">
+<h1>2. How Forces Enter the ODE<a class="headerlink" href="#how-forces-enter-the-ode" title="Link to this heading">#</a></h1>
+<p>Newton’s law for mass <span class="math notranslate nohighlight">\(i\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+m_i \ddot{x}_i
+=
+F_i^{\text{gravity}}
++ 
+\sum_j F_{ij}^{\text{spring}}
++
+\sum_j F_{ij}^{\text{constraint}}.
+\]</div>
+<section id="spring-forces">
+<h2>2.1 Spring Forces<a class="headerlink" href="#spring-forces" title="Link to this heading">#</a></h2>
+<p>Hookean spring law:</p>
+<div class="math notranslate nohighlight">
+\[
+F_{ij}
+=
+k_{ij} \big( \|x_j - x_i\| - L_{ij} \big)
+\frac{x_j - x_i}{\|x_j - x_i\|}.
+\]</div>
+<p>Gravity is constant.</p>
+</section>
+<section id="constraint-forces-via-lagrange-multipliers">
+<h2>2.2 Constraint Forces via Lagrange Multipliers<a class="headerlink" href="#constraint-forces-via-lagrange-multipliers" title="Link to this heading">#</a></h2>
+<p>Instead of manually writing constraint forces, we enlarge the state vector:</p>
+<div class="math notranslate nohighlight">
+\[
+X = (x, \lambda),
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\lambda\)</span> are constraint multipliers.</p>
+<p>This turns the dynamics into a <strong>Differential–Algebraic Equation (DAE)</strong>.</p>
+<p>The right-hand side is implemented in:</p>
+<p><code class="docutils literal notranslate"><span class="pre">MSS_Function&lt;dim&gt;</span></code></p>
+<p>which evaluates all forces, constraints, and Jacobians.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section class="tex2jax_ignore mathjax_ignore" id="implementation-installation">
+<h1>3. Implementation + Installation<a class="headerlink" href="#implementation-installation" title="Link to this heading">#</a></h1>
+<p>Here we should write how to install everything needed to run the models!</p>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="the-extended-state-vector">
+<h1>3. The Extended State Vector<a class="headerlink" href="#the-extended-state-vector" title="Link to this heading">#</a></h1>
+<p>For <span class="math notranslate nohighlight">\(N\)</span> masses and <span class="math notranslate nohighlight">\(C\)</span> constraints the sizes are:</p>
+<ul class="simple">
+<li><p>positions: <span class="math notranslate nohighlight">\(3Nx3N\)</span></p></li>
+<li><p>velocities: <span class="math notranslate nohighlight">\(3Nx3N\)</span></p></li>
+<li><p>accelerations: <span class="math notranslate nohighlight">\(3Nx3N\)</span></p></li>
+<li><p>multipliers: <span class="math notranslate nohighlight">\(CxC\)</span></p></li>
+</ul>
+<p>Thus the state stored in the solver is:
+x[0 : dN] → mass positions
+x[dN : dN + C] → constraint multipliers λ</p>
+<p><code class="docutils literal notranslate"><span class="pre">getState</span></code> and <code class="docutils literal notranslate"><span class="pre">setState</span></code> convert this automatically.</p>
+</section>
+<hr class="docutils" />
+<section class="tex2jax_ignore mathjax_ignore" id="time-integration-the-generalized-method">
+<h1>4. Time Integration: The Generalized α-Method<a class="headerlink" href="#time-integration-the-generalized-method" title="Link to this heading">#</a></h1>
+<p>This chapter should be used to explain the numerical method as well as the exact calculated derivative we used.</p>
+<p>Large spring networks are stiff → explicit methods blow up.</p>
+<p>In class, the Newmark method was introduced.<br />
+However, for nonlinear systems it can become unstable.</p>
+<p>The <strong>generalized α-method</strong> extends Newmark by adding controllable numerical damping.</p>
+<section id="properties">
+<h2>Properties:<a class="headerlink" href="#properties" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>unconditionally stable</p></li>
+<li><p>second-order accurate</p></li>
+<li><p>suitable for stiff springs</p></li>
+<li><p>controllable high-frequency damping</p></li>
+</ul>
+<p>Parameter:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(p_\infty = 1\)</span> → Newmark (no damping)</p></li>
+<li><p><span class="math notranslate nohighlight">\(p_\infty = 0\)</span> → strong damping of high frequencies</p></li>
+</ul>
+<p>We call:</p>
+<p><code class="docutils literal notranslate"><span class="pre">SolveODE_Alpha(...)</span></code></p>
+<p>from our course ODE framework.
+It expects the mass matrix (possibly constraint-modified) and the RHS function.
+Both are provided by:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">MSS_Function&lt;dim&gt;</span></code> — computes forces</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ConstrainedMassMatrixFunction&lt;dim&gt;</span></code> — builds the mass matrix</p></li>
+</ul>
+<p>This is wrapped inside the Python binding so the user only calls:</p>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="n">mss</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="n">tend</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Everything else happens inside the C++ backend.</p>
+</section>
+<section id="the-jacobian-and-why-we-need-it">
+<h2>4.1 The Jacobian and Why We Need It<a class="headerlink" href="#the-jacobian-and-why-we-need-it" title="Link to this heading">#</a></h2>
+<p>Because our system contains nonlinear springs and holonomic constraints enforced
+by Lagrange multipliers, the right-hand side</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+F(x,\lambda)
+=
+\begin{pmatrix}
+F_{\text{forces}}(x,\lambda) \\
+C(x)
+\end{pmatrix}
+\end{split}\]</div>
+<p>is <strong>nonlinear</strong> in both <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(\lambda\)</span>.<br />
+The generalized α-method uses <strong>implicit integration</strong>, which means every timestep requires a
+Newton solve of the form:</p>
+<div class="math notranslate nohighlight">
+\[
+J \, \Delta X = -F,
+\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[
+J = \frac{\partial F}{\partial (x,\lambda)}.
+\]</div>
+<p>Thus we must provide the full Jacobian of the DAE system:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+J =
+\begin{pmatrix}
+\frac{\partial F}{\partial x} &amp; \frac{\partial F}{\partial \lambda} \\
+\frac{\partial C}{\partial x} &amp; 0
+\end{pmatrix}.
+\end{split}\]</div>
+<hr class="docutils" />
+<section id="jacobian-of-springs">
+<h3>4.1.1 Jacobian of Springs<a class="headerlink" href="#jacobian-of-springs" title="Link to this heading">#</a></h3>
+<p>Each spring connecting positions <span class="math notranslate nohighlight">\(p_1\)</span> and <span class="math notranslate nohighlight">\(p_2\)</span> contributes a nonlinear force</p>
+<div class="math notranslate nohighlight">
+\[
+f = k (L - L_0) n,
+\qquad
+n = \frac{p_2 - p_1}{\|p_2 - p_1\|},
+\qquad
+L = \|p_2 - p_1\|,
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(k\)</span> is the stiffness and <span class="math notranslate nohighlight">\(L_0\)</span> is the rest length.</p>
+<p>The exact tangent stiffness matrix is:</p>
+<div class="math notranslate nohighlight">
+\[
+K = k \, n n^\top
+  + \frac{k(L-L_0)}{L} \big( I - n n^\top \big),
+\]</div>
+<p>which can be decomposed into:</p>
+<ul class="simple">
+<li><p><strong>Material stiffness</strong>: <span class="math notranslate nohighlight">\(k \, n n^\top\)</span> (depends on stiffness)</p></li>
+<li><p><strong>Geometric stiffness</strong>: <span class="math notranslate nohighlight">\(\frac{k(L-L_0)}{L} \big( I - n n^\top \big)\)</span> (depends on current force)</p></li>
+</ul>
+<p>For a spring between masses <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>, the force on mass <span class="math notranslate nohighlight">\(i\)</span> is <span class="math notranslate nohighlight">\(f_i = +k(L-L_0)n\)</span> and on mass <span class="math notranslate nohighlight">\(j\)</span> is <span class="math notranslate nohighlight">\(f_j = -k(L-L_0)n\)</span>.</p>
+<p>The force derivatives are:</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{\partial f_i}{\partial p_i} = -K,
+\qquad
+\frac{\partial f_i}{\partial p_j} = +K,
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+\frac{\partial f_j}{\partial p_i} = +K,
+\qquad
+\frac{\partial f_j}{\partial p_j} = -K,
+\]</div>
+<p>which enter the global Jacobian as:</p>
+<ul class="simple">
+<li><p><strong>Diagonal blocks</strong> (e.g., <span class="math notranslate nohighlight">\(\frac{\partial f_i}{\partial p_i}\)</span>): <span class="math notranslate nohighlight">\(-K\)</span></p></li>
+<li><p><strong>Off-diagonal blocks</strong> (e.g., <span class="math notranslate nohighlight">\(\frac{\partial f_i}{\partial p_j}\)</span>): <span class="math notranslate nohighlight">\(+K\)</span></p></li>
+</ul>
+<p>Spring Jacobians give both geometric and material stiffness.</p>
+</section>
+<hr class="docutils" />
+<section id="jacobian-of-constraints">
+<h3>4.1.2 Jacobian of Constraints<a class="headerlink" href="#jacobian-of-constraints" title="Link to this heading">#</a></h3>
+<p>A distance constraint enforces:</p>
+<div class="math notranslate nohighlight">
+\[
+C = \|p_2 - p_1\| - L_0 = 0,
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(L_0\)</span> is the fixed constraint length.</p>
+<p>Define the unit direction vector:</p>
+<div class="math notranslate nohighlight">
+\[
+n = \frac{p_2 - p_1}{L},
+\qquad
+L = \|p_2 - p_1\|.
+\]</div>
+<p>The constraint gradient is:</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{\partial C}{\partial p_1} = -n,
+\qquad
+\frac{\partial C}{\partial p_2} = +n.
+\]</div>
+<p>Constraint forces are applied via Lagrange multipliers. In the code, the gradient is stored as <code class="docutils literal notranslate"><span class="pre">dC1</span> <span class="pre">=</span> <span class="pre">(p2-p1)/L</span> <span class="pre">=</span> <span class="pre">n</span></code>, which represents the direction from <span class="math notranslate nohighlight">\(p_1\)</span> to <span class="math notranslate nohighlight">\(p_2\)</span>. The forces applied are:</p>
+<div class="math notranslate nohighlight">
+\[
+f_1 = \lambda \cdot n \quad \text{(code: } \texttt{lam * dC1}\text{)},
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+f_2 = -\lambda \cdot n \quad \text{(code: } \texttt{lam * dC2}\text{)}.
+\]</div>
+<p>The derivative of the unit direction with respect to position changes is:</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{\partial n}{\partial (p_2 - p_1)}
+= \frac{1}{L}\big(I - nn^\top\big) \equiv M.
+\]</div>
+<p>Therefore:</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{\partial n}{\partial p_1} = -M,
+\qquad
+\frac{\partial n}{\partial p_2} = +M.
+\]</div>
+<p>The Jacobian block for constraint forces is:</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{\partial f_1}{\partial p_1} = -\lambda M,
+\qquad
+\frac{\partial f_1}{\partial p_2} = +\lambda M,
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+\frac{\partial f_2}{\partial p_1} = +\lambda M,
+\qquad
+\frac{\partial f_2}{\partial p_2} = -\lambda M.
+\]</div>
+<p>In matrix form:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\frac{\partial F_{\text{constraint}}}{\partial x}
+=
+\begin{pmatrix}
+-\lambda M &amp; +\lambda M \\
++\lambda M &amp; -\lambda M
+\end{pmatrix},
+\qquad
+M = \frac{1}{L}(I - n n^\top).
+\end{split}\]</div>
+<p>The derivative of constraint forces w.r.t. the multiplier <span class="math notranslate nohighlight">\(\lambda\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{\partial f_1}{\partial \lambda} = +n,
+\qquad
+\frac{\partial f_2}{\partial \lambda} = -n.
+\]</div>
+<p>In vector form:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\frac{\partial F}{\partial \lambda}
+=
+\begin{pmatrix}
++n \\ -n
+\end{pmatrix}.
+\end{split}\]</div>
+<p>The constraint equation derivatives (bottom row of Jacobian):</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{\partial C}{\partial p_1} = -n,
+\qquad
+\frac{\partial C}{\partial p_2} = +n,
+\qquad
+\frac{\partial C}{\partial \lambda} = 0.
+\]</div>
+<p>In row vector form:</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{\partial C}{\partial x}
+=
+[-n^\top \;\; +n^\top],
+\qquad
+\frac{\partial C}{\partial \lambda} = 0.
+\]</div>
+</section>
+<section id="full-constraint-jacobian-structure">
+<h3>4.1.3 Full Constraint Jacobian Structure<a class="headerlink" href="#full-constraint-jacobian-structure" title="Link to this heading">#</a></h3>
+<p>For a system with <span class="math notranslate nohighlight">\(N\)</span> masses (dimension <span class="math notranslate nohighlight">\(dN\)</span>) and <span class="math notranslate nohighlight">\(C\)</span> constraints, the Jacobian is a <span class="math notranslate nohighlight">\((dN+C) \times (dN+C)\)</span> matrix.</p>
+<p>For a single constraint <span class="math notranslate nohighlight">\(k\)</span> between masses <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>, combining all derivatives:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+J =
+\begin{pmatrix}
+\frac{\partial F_{\text{forces}}}{\partial x} &amp; \frac{\partial F_{\text{forces}}}{\partial \lambda} \\
+\frac{\partial C}{\partial x} &amp; 0
+\end{pmatrix}.
+\end{split}\]</div>
+<p>For the specific case of <strong>one constraint between two masses</strong> (mass 1 and mass 2), the structure is:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+J =
+\begin{pmatrix}
+-\lambda M &amp; +\lambda M &amp; +n \\
++\lambda M &amp; -\lambda M &amp; -n \\
+-n^\top     &amp; +n^\top     &amp; 0
+\end{pmatrix},
+\end{split}\]</div>
+<p>where:</p>
+<ul class="simple">
+<li><p><strong>Top-left block</strong> (<span class="math notranslate nohighlight">\(2d \times 2d\)</span>): Force derivatives w.r.t. positions</p>
+<ul>
+<li><p>Block <span class="math notranslate nohighlight">\((1,1)\)</span>: <span class="math notranslate nohighlight">\(-\lambda M\)</span> (force on mass 1 w.r.t. position 1)</p></li>
+<li><p>Block <span class="math notranslate nohighlight">\((1,2)\)</span>: <span class="math notranslate nohighlight">\(+\lambda M\)</span> (force on mass 1 w.r.t. position 2)</p></li>
+<li><p>Block <span class="math notranslate nohighlight">\((2,1)\)</span>: <span class="math notranslate nohighlight">\(+\lambda M\)</span> (force on mass 2 w.r.t. position 1)</p></li>
+<li><p>Block <span class="math notranslate nohighlight">\((2,2)\)</span>: <span class="math notranslate nohighlight">\(-\lambda M\)</span> (force on mass 2 w.r.t. position 2)</p></li>
+</ul>
+</li>
+<li><p><strong>Top-right block</strong> (<span class="math notranslate nohighlight">\(2d \times 1\)</span>): Force derivatives w.r.t. multiplier</p>
+<ul>
+<li><p>Row 1: <span class="math notranslate nohighlight">\(+n\)</span> (<span class="math notranslate nohighlight">\(\partial f_1/\partial \lambda\)</span>)</p></li>
+<li><p>Row 2: <span class="math notranslate nohighlight">\(-n\)</span> (<span class="math notranslate nohighlight">\(\partial f_2/\partial \lambda\)</span>)</p></li>
+</ul>
+</li>
+<li><p><strong>Bottom-left block</strong> (<span class="math notranslate nohighlight">\(1 \times 2d\)</span>): Constraint derivatives w.r.t. positions</p>
+<ul>
+<li><p>Column 1: <span class="math notranslate nohighlight">\(-n^\top\)</span> (<span class="math notranslate nohighlight">\(\partial C/\partial p_1\)</span>)</p></li>
+<li><p>Column 2: <span class="math notranslate nohighlight">\(+n^\top\)</span> (<span class="math notranslate nohighlight">\(\partial C/\partial p_2\)</span>)</p></li>
+</ul>
+</li>
+<li><p><strong>Bottom-right block</strong> (<span class="math notranslate nohighlight">\(1 \times 1\)</span>): Zero (<span class="math notranslate nohighlight">\(\partial C/\partial \lambda = 0\)</span>)</p></li>
+</ul>
+<p>In a multi-mass system with many constraints, these blocks are assembled into the appropriate rows and columns corresponding to each constrained mass pair and each constraint equation.</p>
+</section>
+<hr class="docutils" />
+<section id="where-the-jacobian-is-implemented-in-the-code">
+<h3>4.1.4 Where the Jacobian Is Implemented in the Code<a class="headerlink" href="#where-the-jacobian-is-implemented-in-the-code" title="Link to this heading">#</a></h3>
+<p>The Jacobian is implemented inside the method:</p>
+<p><code class="docutils literal notranslate"><span class="pre">MSS_Function&lt;D&gt;::evaluateDeriv(...)</span></code></p>
+</section>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="interaction-from-python">
+<h1>5.Interaction From Python<a class="headerlink" href="#interaction-from-python" title="Link to this heading">#</a></h1>
+<p>To make the system usable inside Jupyter, we use a pybind11 module (<code class="docutils literal notranslate"><span class="pre">mass_spring</span></code>).
+It exposes:</p>
+<ul class="simple">
+<li><p>MassSpringSystem3d / MassSpringSystem2d</p></li>
+<li><p>Mass, Fix, Spring, Chain, DistanceConstraint</p></li>
+<li><p>access to lists: masses, springs, constraints</p></li>
+<li><p>the simulate method</p></li>
+</ul>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="python-example">
+<h1>5.1 Python Example<a class="headerlink" href="#python-example" title="Link to this heading">#</a></h1>
+<p>Here is a minimal example:</p>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mass_spring</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ms</span>
+
+<span class="n">mss</span> <span class="o">=</span> <span class="n">ms</span><span class="o">.</span><span class="n">MassSpringSystem3d</span><span class="p">()</span>
+<span class="n">mss</span><span class="o">.</span><span class="n">gravity</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mf">9.81</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># build a simple chain</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">mss</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ms</span><span class="o">.</span><span class="n">Fix</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]))</span>
+<span class="n">m1</span> <span class="o">=</span> <span class="n">mss</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ms</span><span class="o">.</span><span class="n">Mass</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]))</span>
+<span class="n">m2</span> <span class="o">=</span> <span class="n">mss</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ms</span><span class="o">.</span><span class="n">Mass</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]))</span>
+
+<span class="n">mss</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ms</span><span class="o">.</span><span class="n">Spring</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">,</span> <span class="p">[</span><span class="n">f</span><span class="p">,</span> <span class="n">m1</span><span class="p">]))</span>
+<span class="n">mss</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ms</span><span class="o">.</span><span class="n">Spring</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">,</span> <span class="p">[</span><span class="n">m1</span><span class="p">,</span> <span class="n">m2</span><span class="p">]))</span>
+
+<span class="c1"># optional constraint between m1 and m2</span>
+<span class="n">mss</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ms</span><span class="o">.</span><span class="n">DistanceConstraint</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="p">[</span><span class="n">m1</span><span class="p">,</span> <span class="n">m2</span><span class="p">]))</span>
+
+<span class="c1"># run the simulation</span>
+<span class="n">mss</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="n">tend</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+
+</pre></div>
+</div>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="visualization-in-jupyter">
+<h1>5.2 Visualization in Jupyter<a class="headerlink" href="#visualization-in-jupyter" title="Link to this heading">#</a></h1>
+<p>After simulation, the positions of the masses have been updated, and we can visualize them directly using Three.js objects in python.</p>
+<p>Visualization in Jupyter (Short Notes)
+We can use pythreejs to visualize masses as spheres and springs as line segments.
+Because the C++ backend maintains up-to-date positions, animating is as simple as:</p>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mss</span><span class="o">.</span><span class="n">masses</span><span class="p">):</span>
+    <span class="n">sphere_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">pos</span>
+</pre></div>
+</div>
+<p>This allowed us to build hanging chains, constrained pendulums, a little “bridge”, and a spinning spring–kreisel model.</p>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="summary-of-implementation-with-python">
+<h1>5.3 Summary of Implementation with Python<a class="headerlink" href="#summary-of-implementation-with-python" title="Link to this heading">#</a></h1>
+<p>Summary of This Extension
+In this extension of the project we:</p>
+<ul class="simple">
+<li><p>generalized the mass–spring model to many nodes,</p></li>
+<li><p>added fixes, chains, and constraints,</p></li>
+<li><p>implemented the full system as a DAE with Lagrange multipliers,</p></li>
+<li><p>applied the α-method for stable time integration,</p></li>
+<li><p>wrote Python bindings so the system can be used interactively,</p></li>
+<li><p>created Jupyter notebooks for visualization.</p></li>
+<li><p>Build the module using CMake</p></li>
+</ul>
+<p>User guideline</p>
+<ul class="simple">
+<li><p>Import it in Python</p></li>
+<li><p>Create a MassSpringSystem2d or MassSpringSystem3d</p></li>
+<li><p>Add masses, fixes, springs, and optionally constraints</p></li>
+<li><p>Call .simulate(tend, steps)</p></li>
+<li><p>Read out m.pos for visualization or analysis</p></li>
+</ul>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="examples">
+<h1>6. Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h1>
+<p>Below is a summary of the Jupyter notebooks included with the project.</p>
+<section id="mass-spring-chain">
+<h2>6.1 Mass Spring Chain<a class="headerlink" href="#mass-spring-chain" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">mass_spring_chain.ipynb</span></code> – Hanging Chain
+This is the “intro example” notebook.
+It shows the simplest nontrivial use case: a chain of masses connected by springs, hanging under gravity.
+What it demonstrates:</p>
+<ul class="simple">
+<li><p>Creating 3D masses and fixes</p></li>
+<li><p>Adding a sequence of springs</p></li>
+<li><p>Running the α–method integrator</p></li>
+<li><p>Visualizing positions with pythreejs</p></li>
+</ul>
+<p>Core idea:
+We build something like:</p>
+<p>Fix
+|
+Spring
+|
+Mass1
+|
+Spring
+|
+Mass2
+…</p>
+<p>Key code pattern</p>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="n">mss</span> <span class="o">=</span> <span class="n">ms</span><span class="o">.</span><span class="n">MassSpringSystem3d</span><span class="p">()</span>
+<span class="n">mss</span><span class="o">.</span><span class="n">gravity</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mf">9.81</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+<span class="n">fix</span> <span class="o">=</span> <span class="n">mss</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ms</span><span class="o">.</span><span class="n">Fix</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]))</span>
+
+<span class="n">m_prev</span> <span class="o">=</span> <span class="n">fix</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">mss</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ms</span><span class="o">.</span><span class="n">Mass</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
+    <span class="n">mss</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ms</span><span class="o">.</span><span class="n">Spring</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="p">[</span><span class="n">m_prev</span><span class="p">,</span> <span class="n">m</span><span class="p">]))</span>
+    <span class="n">m_prev</span> <span class="o">=</span> <span class="n">m</span>
+
+<span class="n">mss</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="mi">800</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You see the chain sag and oscillate — a sort of sanity check that the system behaves as a physical rope.</p>
+</section>
+<section id="mass-spring-bridge">
+<h2>6.1 Mass Spring Bridge<a class="headerlink" href="#mass-spring-bridge" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">mass_spring_bridge.ipynb</span></code> – A Little Cable Bridge / Lattice</p>
+<p>Instead of a simple chain, we build a 2D grid of masses connected by springs, so the structure behaves like a flexible mini-bridge.
+What it demonstrates:</p>
+<ul class="simple">
+<li><p>Creating structured grids of masses</p></li>
+<li><p>Connecting each node to neighbors</p></li>
+<li><p>Adding cross-bracing diagonals</p></li>
+<li><p>Fixing anchor nodes at both ends</p></li>
+<li><p>Dynamic deformation under gravity</p></li>
+</ul>
+<p>Structure</p>
+<p>We create a W×H lattice:
+●───●───●───●   ← fixed on left + right
+│  /│  /│  /
+●───●───●───●</p>
+<p>Key code pattern</p>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="n">W</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">2</span>
+<span class="n">nodes</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">W</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">mss</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ms</span><span class="o">.</span><span class="n">Mass</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="o">-</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+    <span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+<span class="c1"># fix the left and right ends</span>
+<span class="n">mss</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ms</span><span class="o">.</span><span class="n">Fix</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]))</span>
+<span class="n">mss</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ms</span><span class="o">.</span><span class="n">Fix</span><span class="p">([</span><span class="n">W</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]))</span>
+
+<span class="c1"># connect horizontal, vertical, and diagonal springs</span>
+
+</pre></div>
+</div>
+<p>When simulated, the bridge bends and vibrates realistically — and this already shows why stable implicit integration is essential.</p>
+</section>
+<section id="mass-spring-constraint">
+<h2>6.3 Mass Spring Constraint<a class="headerlink" href="#mass-spring-constraint" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">mass_spring_constraint.ipynb</span></code> – Rigid Rod / Pendulum Using Constraints
+This example introduces distance constraints, which enforce a fixed length between two nodes using Lagrange multipliers. We introduce this because modeling the problem with its angle becomes quite difficult for complex systems.
+The constraints thereby enforces the system, s.t. The mass always stays exactly at distance l from the anchor point x_0. So it always lies on a circle with radius l, which is the rod length.</p>
+<p>What it demonstrates:</p>
+<ul class="simple">
+<li><p>Adding DistanceConstraint objects</p></li>
+<li><p>Mixing springs and constraints</p></li>
+<li><p>Understanding how constraints give rigid-body-like behavior</p></li>
+</ul>
+<p>Core example
+A rigid pendulum:</p>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="n">fix</span> <span class="o">=</span> <span class="n">mss</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ms</span><span class="o">.</span><span class="n">Fix</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]))</span>
+<span class="n">m</span>   <span class="o">=</span> <span class="n">mss</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ms</span><span class="o">.</span><span class="n">Mass</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]))</span>
+
+<span class="c1"># keep them exactly 1 unit apart</span>
+<span class="n">mss</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ms</span><span class="o">.</span><span class="n">DistanceConstraint</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="p">[</span><span class="n">fix</span><span class="p">,</span> <span class="n">m</span><span class="p">]))</span>
+
+<span class="n">mss</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="mi">600</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The result is a clean swing, not a stretchy spring.
+This notebook demonstrates how constraints do not require any user-side derivative computations — the library handles the DAE system internally.</p>
+</section>
+<section id="mass-spring-kreisel">
+<h2>6.4 Mass Spring Kreisel<a class="headerlink" href="#mass-spring-kreisel" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">mass_spring_kreisel.ipynb</span></code> – Spinning Spring Kreisel
+This creates a kind of spinning top / rotor made of springs.
+As it rotates, the spring arrangement stabilizes due to centripetal forces.</p>
+<p>What it demonstrates:</p>
+<ul class="simple">
+<li><p>Building circular spring structures</p></li>
+<li><p>Understanding rotation stabilization</p></li>
+<li><p>The effect of stiffness vs. rotation speed</p></li>
+<li><p>How our solver handles stiff, fast-moving systems</p></li>
+</ul>
+<p>Geometry
+We arrange masses on a circle and connect neighbors with springs:
+●───●
+/       <br />
+●         ●
+\       /
+●───●</p>
+<p>Then spin the structure by assigning initial velocities.</p>
+<p>Key code snippet</p>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">N</span> <span class="o">=</span> <span class="mi">12</span>
+<span class="n">R</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">masses</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># place masses in a circle</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">angle</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">i</span><span class="o">/</span><span class="n">N</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="p">[</span><span class="n">R</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">),</span> <span class="n">R</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="p">),</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">mss</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ms</span><span class="o">.</span><span class="n">Mass</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
+    <span class="n">masses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+
+<span class="c1"># connect neighbors</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">mss</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ms</span><span class="o">.</span><span class="n">Spring</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">,</span> <span class="p">[</span><span class="n">masses</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">masses</span><span class="p">[(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">%</span><span class="n">N</span><span class="p">]]))</span>
+
+<span class="c1"># give initial spinning velocity</span>
+
+</pre></div>
+</div>
+<p>The kreisel stabilizes, showing off the robustness of the α-method.</p>
+</section>
+<section id="double-chain-pendulum">
+<h2>6.5 Double Chain Pendulum<a class="headerlink" href="#double-chain-pendulum" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">double_chain_pendulum.ipynb</span></code> – Two Pendulums Linked in a Chain
+This notebook combines everything:</p>
+<ul class="simple">
+<li><p>multiple masses</p></li>
+<li><p>constraints</p></li>
+<li><p>springs</p></li>
+<li><p>gravity</p></li>
+<li><p>chaotic motion</p></li>
+</ul>
+<p>The system is a “double pendulum” but built using our API rather than closed-form equations.
+This makes the motion unpredictable and visually interesting.</p>
+<p>What it demonstrates:</p>
+<ul class="simple">
+<li><p>Chaining constraints to make articulated structures</p></li>
+<li><p>Nonlinear, chaotic dynamics</p></li>
+<li><p>Importance of small time steps</p></li>
+</ul>
+<p>Core idea
+Fix  ●
+<br />
+(constraint)
+<br />
+● Mass 1
+<br />
+(constraint)
+<br />
+● Mass 2</p>
+<p>Key snippet</p>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="n">f</span> <span class="o">=</span> <span class="n">mss</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ms</span><span class="o">.</span><span class="n">Fix</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]))</span>
+<span class="n">m1</span> <span class="o">=</span> <span class="n">mss</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ms</span><span class="o">.</span><span class="n">Mass</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]))</span>
+<span class="n">m2</span> <span class="o">=</span> <span class="n">mss</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ms</span><span class="o">.</span><span class="n">Mass</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]))</span>
+
+<span class="n">mss</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ms</span><span class="o">.</span><span class="n">DistanceConstraint</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="p">[</span><span class="n">f</span><span class="p">,</span> <span class="n">m1</span><span class="p">]))</span>
+<span class="n">mss</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ms</span><span class="o">.</span><span class="n">DistanceConstraint</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="p">[</span><span class="n">m1</span><span class="p">,</span> <span class="n">m2</span><span class="p">]))</span>
+
+<span class="n">mss</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The motion looks chaotic — just like a theoretical double pendulum should — but here it comes purely from the mass–spring–constraint model.</p>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="summary-of-example-notebooks">
+<h1>7. Summary of Example Notebooks<a class="headerlink" href="#summary-of-example-notebooks" title="Link to this heading">#</a></h1>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Notebook</p></th>
+<th class="head"><p>Focus</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mass_spring_chain</span></code></p></td>
+<td><p>Basic spring networks, ropes</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mass_spring_bridge</span></code></p></td>
+<td><p>2D lattices, structural stability</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mass_spring_constraint</span></code></p></td>
+<td><p>Lagrange constraints, rigid rods</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mass_spring_kreisel</span></code></p></td>
+<td><p>Rotation, stiff dynamics</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">double_chain_pendulum</span></code></p></td>
+<td><p>Chains of constraints, chaotic motion</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="example_autodiff.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Autodiff</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="other_stuff.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Useful Classes</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Mass–Spring Systems as ODEs and DAEs</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#building-a-full-massspring-network">1. Building a Full Mass–Spring Network</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#how-forces-enter-the-ode">2. How Forces Enter the ODE</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spring-forces">2.1 Spring Forces</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#constraint-forces-via-lagrange-multipliers">2.2 Constraint Forces via Lagrange Multipliers</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation-installation">3. Implementation + Installation</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#the-extended-state-vector">3. The Extended State Vector</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#time-integration-the-generalized-method">4. Time Integration: The Generalized α-Method</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#properties">Properties:</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-jacobian-and-why-we-need-it">4.1 The Jacobian and Why We Need It</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#jacobian-of-springs">4.1.1 Jacobian of Springs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#jacobian-of-constraints">4.1.2 Jacobian of Constraints</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#full-constraint-jacobian-structure">4.1.3 Full Constraint Jacobian Structure</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#where-the-jacobian-is-implemented-in-the-code">4.1.4 Where the Jacobian Is Implemented in the Code</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#interaction-from-python">5.Interaction From Python</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#python-example">5.1 Python Example</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#visualization-in-jupyter">5.2 Visualization in Jupyter</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-implementation-with-python">5.3 Summary of Implementation with Python</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">6. Examples</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mass-spring-chain">6.1 Mass Spring Chain</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mass-spring-bridge">6.1 Mass Spring Bridge</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mass-spring-constraint">6.3 Mass Spring Constraint</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mass-spring-kreisel">6.4 Mass Spring Kreisel</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#double-chain-pendulum">6.5 Double Chain Pendulum</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-example-notebooks">7. Summary of Example Notebooks</a></li>
+</ul>
+
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Team 03
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
