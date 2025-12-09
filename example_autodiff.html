@@ -62,7 +62,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'example_autodiff';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Useful Classes" href="other_stuff.html" />
+    <link rel="next" title="Mechanical Systems" href="example_mechsystems.html" />
     <link rel="prev" title="Runge Kutta" href="example_runge_kutta.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -191,6 +191,16 @@
 <li class="toctree-l2"><a class="reference internal" href="example_electric_network.html">Electric Network</a></li>
 <li class="toctree-l2"><a class="reference internal" href="example_runge_kutta.html">Runge Kutta</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Autodiff</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_mechsystems.html">Mechanical Systems</a></li>
+
+
+
+
+
+
+
+
+
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="other_stuff.html">Useful Classes</a></li>
@@ -363,13 +373,23 @@ document.write(`
 <h1>Autodiff<a class="headerlink" href="#autodiff" title="Link to this heading">#</a></h1>
 <p>This part of the report summarizes the implementation and testing of an automatic differentiation (AutoDiff) class applied to two problems: solving the pendulum ODE and evaluating Legendre polynomials with their derivatives. Automatic differentiation provides exact derivatives without numerical approximation errors.</p>
 <p>The AutoDiff class template stores both values and derivatives, with comprehensive operator overloading for basic arithmetic:</p>
-<p>-Addition, subtraction, multiplication, and division operators
--Support for AutoDiff-AutoDiff and constant-AutoDiff combinations
--Proper implementation of derivative rules (product rule, quotient rule)</p>
+<ul class="simple">
+<li><p>Addition, subtraction, multiplication, and division operators</p></li>
+<li><p>Support for AutoDiff-AutoDiff and constant-AutoDiff combinations</p></li>
+<li><p>Proper implementation of derivative rules (product rule, quotient rule)</p></li>
+</ul>
 <p>Moreover we extended for the eelementary functions: sin, cos, exp, log.</p>
-<p>In the other hand The pendulum equation <span class="math notranslate nohighlight">\(\alpha'' = -\frac{g}{l}\sin(\alpha)\)</span> was reformulated as a first-order system:
-<span class="math notranslate nohighlight">\(y_0' &amp;= y_1\)</span>
-<span class="math notranslate nohighlight">\(y_1' &amp;= -\frac{g}{l}\sin(y_0)\)</span></p>
+<p>On the other hand, the pendulum equation
+$<span class="math notranslate nohighlight">\(
+\alpha'' = -\frac{g}{l}\sin(\alpha)
+\)</span><span class="math notranslate nohighlight">\(
+can be reformulated as a first-order system:
+\)</span><span class="math notranslate nohighlight">\(
+\begin{aligned}
+	y_0' &amp;= y_1 \\
+	y_1' &amp;= -\frac{g}{l}\sin(y_0)
+\end{aligned}
+\)</span>$</p>
 <p>Testing with initial condition <span class="math notranslate nohighlight">\([\pi/4, 0.1]\)</span> gave:</p>
 <p>Function: <span class="math notranslate nohighlight">\(f(x) = [0.1, -0.567669]\)</span>
 Jacobian: <span class="math notranslate nohighlight">\(\begin{bmatrix} 0 &amp; 1 \\ -0.800633 &amp; 0 \end{bmatrix}\)</span></p>
@@ -419,11 +439,11 @@ Jacobian: <span class="math notranslate nohighlight">\(\begin{bmatrix} 0 &amp; 1
       </div>
     </a>
     <a class="right-next"
-       href="other_stuff.html"
+       href="example_mechsystems.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Useful Classes</p>
+        <p class="prev-next-title">Mechanical Systems</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
